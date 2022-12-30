@@ -10,7 +10,7 @@
 [![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Twitter)](https://twitter.com/mlflow-flavors)
 -->
 
-[![Project generated with PyScaffold](https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold)](https://pyscaffold.org/)
+[![github-actions](https://img.shields.io/github/actions/workflow/status/blue-pen-labs/mlflow-flavors/ci.yml?logo=github)](https://github.com/blue-pen-labs/mlflow-flavors/actions/workflows/ci.yml)
 
 # mlflow-flavors
 
