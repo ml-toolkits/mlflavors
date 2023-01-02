@@ -3,7 +3,7 @@ import pytest
 from mlflow_flavors.skeleton import fib, main
 
 __author__ = "Benjamin Bluhm"
-__copyright__ = "Benjamin Bluhm"
+__copyright__ = "Blue Pen Labs"
 __license__ = "BSD-3-Clause"
 
 

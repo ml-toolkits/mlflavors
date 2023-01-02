@@ -27,7 +27,7 @@ import sys
 from mlflow_flavors import __version__
 
 __author__ = "Benjamin Bluhm"
-__copyright__ = "Benjamin Bluhm"
+__copyright__ = "Blue Pen Labs"
 __license__ = "BSD-3-Clause"
 
 _logger = logging.getLogger(__name__)
