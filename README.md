@@ -10,7 +10,7 @@
 [![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Twitter)](https://twitter.com/mlflow-flavors)
 -->
 
-[![github-actions](https://img.shields.io/github/actions/workflow/status/blue-pen-labs/mlflow-flavors/ci.yml?logo=github)](https://github.com/blue-pen-labs/mlflow-flavors/actions/workflows/ci.yml)
+[![tests](https://github.com/blue-pen-labs/mlflow-flavors/actions/workflows/ci.yml/badge.svg)](https://github.com/blue-pen-labs/mlflow-flavors/actions/workflows/ci.yml)
 
 # mlflow-flavors
 
