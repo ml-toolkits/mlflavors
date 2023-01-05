@@ -69,8 +69,6 @@ jobs:
       - name: Retrieve pre-built distribution files
         uses: actions/download-artifact@v3
         with: {name: python-distribution-files, path: dist/}
-      - name: Install PyStan requirements
-        run: sudo apt-get install build-essential libssl-dev libffi-dev python3-dev
       - name: Run tests
         run: >-
           pipx run --spec tox==3.27.1 tox
