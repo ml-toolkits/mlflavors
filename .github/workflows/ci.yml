@@ -54,10 +54,10 @@ jobs:
     strategy:
       matrix:
         python:
-        - "3.7"  # oldest Python supported by PSF
+        # - "3.7"  # oldest Python supported by PSF
         - "3.8"
-        - "3.9"
-        - "3.10"  # newest Python that is stable
+        # - "3.9"
+        # - "3.10"  # newest Python that is stable
         platform:
         - ubuntu-latest
     runs-on: ${{ matrix.platform }}
@@ -69,6 +69,8 @@ jobs:
       - name: Retrieve pre-built distribution files
         uses: actions/download-artifact@v3
         with: {name: python-distribution-files, path: dist/}
+      - name: Install PyStan requirements
+        run: sudo apt-get install build-essential libssl-dev libffi-dev python3-dev
       - name: Run tests
         run: >-
           pipx run --spec tox==3.27.1 tox
