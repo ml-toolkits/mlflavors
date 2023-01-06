@@ -54,5 +54,4 @@ MANIFEST
 .python-version
 
 # MLflow artifacts
-examples/*
 mlruns/*
