@@ -15,6 +15,6 @@ except PackageNotFoundError:  # pragma: no cover
 finally:
     del version, PackageNotFoundError
 
-from mlflow_flavors import orbit, skeleton
+from mlflow_flavors import orbit
 
-__all__ = ["orbit", "skeleton"]
+__all__ = ["orbit"]
