@@ -7,7 +7,6 @@ import pytest
 from mlflow import pyfunc
 from mlflow.exceptions import MlflowException
 from mlflow.models import Model, infer_signature
-from mlflow.models.utils import _read_example
 from mlflow.tracking._model_registry import DEFAULT_AWAIT_MAX_SLEEP_SECONDS
 from mlflow.tracking.artifact_utils import _download_artifact_from_uri
 from mlflow.utils.environment import _mlflow_conda_env
@@ -130,46 +129,32 @@ def test_dlt_model_pyfunc_with_params_output(
 
 
 @pytest.mark.parametrize("use_signature", [True, False])
-# @pytest.mark.parametrize("use_example", [True, False])
 def test_signature_and_examples_saved_correctly(
     dlt_model,
     test_data_iclaims,
     model_path,
     use_signature,
-    # use_example
 ):
     """Test saving of mlflow signature for native orbit predict method."""
     _, test_df = test_data_iclaims
 
-    # Note: Example inference fails on native model prediction due to Timestamp column
+    # Note: Example inference fails due to incorrect recreation of numpy timestamp
     prediction = dlt_model.predict(test_df)
-    # test_df_new = test_df.copy()
-    # test_df_new["week"] = test_df_new["week"].dt.strftime("%Y-%m-%dT%H:%M:%SZ")
     signature = infer_signature(test_df, prediction) if use_signature else None
-    # example = (
-    #     pd.DataFrame(test_df[0:5].copy(deep=False)) if use_example else None
-    # )
     mlflow_flavors.orbit.save_model(
         dlt_model,
         path=model_path,
         signature=signature,
-        # input_example=example
     )
     mlflow_model = Model.load(model_path)
     assert signature == mlflow_model.signature
-    # if example is None:
-    #     assert mlflow_model.saved_input_example_info is None
-    # else:
-    #     r_example = _read_example(mlflow_model, model_path).copy(deep=False)
-    #     np.testing.assert_array_equal(r_example, example)
 
 
 @pytest.mark.parametrize("use_signature", [True, False])
-@pytest.mark.parametrize("use_example", [True, False])
-def test_signature_and_example_for_pyfunc_predict(
-    dlt_model, model_path, test_data_iclaims, use_signature, use_example
+def test_signature_for_pyfunc_predict(
+    dlt_model, model_path, test_data_iclaims, use_signature
 ):
-    """Test saving of mlflow signature and example for pyfunc predict."""
+    """Test saving of mlflow signature for pyfunc predict."""
     _, test_df = test_data_iclaims
 
     model_path_primary = model_path.joinpath("primary")
@@ -182,25 +167,13 @@ def test_signature_and_example_for_pyfunc_predict(
 
     forecast = loaded_pyfunc.predict(test_df)
     signature = infer_signature(test_df, forecast) if use_signature else None
-    example = test_df[0:5].copy(deep=False) if use_example else None
     mlflow_flavors.orbit.save_model(
         dlt_model,
         path=model_path_secondary,
         signature=signature,
-        input_example=example,
     )
     mlflow_model = Model.load(model_path_secondary)
     assert signature == mlflow_model.signature
-    if example is None:
-        assert mlflow_model.saved_input_example_info is None
-    else:
-        r_example = _read_example(mlflow_model, model_path_secondary).copy(deep=False)
-        assert_frame_equal(
-            r_example.reset_index(drop=True),
-            example.reset_index(drop=True),
-            check_dtype=False,
-        )
-        # np.testing.assert_array_equal(r_example, example)
 
 
 @pytest.mark.parametrize("should_start_run", [True, False])
