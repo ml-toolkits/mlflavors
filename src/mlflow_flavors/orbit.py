@@ -30,6 +30,7 @@ import logging
 import os
 import pickle
 
+import mlflow
 import orbit
 import yaml
 from mlflow import pyfunc
@@ -248,7 +249,15 @@ def save_model(
                 serialization_format == SERIALIZATION_FORMAT_CLOUDPICKLE
             )
             default_reqs = get_default_pip_requirements(include_cloudpickle)
-            default_reqs = sorted(default_reqs)
+            # To ensure `_load_pyfunc` can successfully load the model during the
+            # dependency inference, `mlflow_model.save` must be called beforehand
+            # to save an MLmodel file.
+            inferred_reqs = mlflow.models.infer_pip_requirements(
+                model_data_path,
+                FLAVOR_NAME,
+                fallback=default_reqs,
+            )
+            default_reqs = sorted(set(inferred_reqs).union(default_reqs))
         else:
             default_reqs = None
         conda_env, pip_requirements, pip_constraints = _process_pip_requirements(
