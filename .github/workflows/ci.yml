@@ -70,7 +70,9 @@ jobs:
         uses: actions/download-artifact@v3
         with: {name: python-distribution-files, path: dist/}
       - name: Run example notebooks
-        run: pipx run --spec tox==3.27.1 tox -e notebooks
+        run:  >-
+          pipx run --spec tox==3.27.1 tox -e notebooks
+          --installpkg '${{ needs.prepare.outputs.wheel-distribution }}'
 
   test:
     needs: prepare
