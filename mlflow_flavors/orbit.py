@@ -1,5 +1,3 @@
-#!/usr/bin/env python3 -u
-# -*- coding: utf-8 -*-
 """The ``mlflow_flavors.orbit`` module provides an MLflow API for ``orbit`` models.
 
 This module exports ``orbit`` models in the following formats:
@@ -466,7 +464,6 @@ def load_model(model_uri, dst_path=None):
 
 
 def _save_model(model, path, serialization_format):
-
     with open(path, "wb") as out:
         if serialization_format == SERIALIZATION_FORMAT_PICKLE:
             pickle.dump(model, out)
@@ -485,7 +482,6 @@ def _save_model(model, path, serialization_format):
 
 
 def _load_model(path, serialization_format):
-
     if serialization_format not in SUPPORTED_SERIALIZATION_FORMATS:
         raise MlflowException(
             message=(
@@ -559,12 +555,10 @@ class _OrbitModelWrapper:
         self.orbit_model = orbit_model
 
     def predict(self, X):
-
         if not hasattr(self.orbit_model, PYFUNC_PREDICT_CONF):
             predictions = self.orbit_model.predict(X)
 
         else:
-
             if not isinstance(self.orbit_model.pyfunc_predict_conf, dict):
                 raise MlflowException(
                     f"Attribute {PYFUNC_PREDICT_CONF} must be of type dict.",
