@@ -145,8 +145,9 @@ def save_model(
         .. code-block:: py
 
           from mlflow.models.signature import infer_signature
+
           train = df.drop_column("target_label")
-          predictions = ... # compute model predictions
+          predictions = ...  # compute model predictions
           signature = infer_signature(train, predictions)
     input_example : Union[pandas.core.frame.DataFrame, numpy.ndarray, dict, list, csr_matrix, csc_matrix], optional (default=None)
         Input example provides one or several instances of valid model input.
@@ -320,8 +321,9 @@ def log_model(
         .. code-block:: py
 
           from mlflow.models.signature import infer_signature
+
           train = df.drop_column("target_label")
-          predictions = ... # compute model predictions
+          predictions = ...  # compute model predictions
           signature = infer_signature(train, predictions)
     input_example : Union[pandas.core.frame.DataFrame, numpy.ndarray, dict, list, csr_matrix, csc_matrix], optional (default=None)
         Input example provides one or several instances of valid model input.
