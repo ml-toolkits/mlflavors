@@ -26,7 +26,7 @@ DOC_REQUIREMENTS = [
 ]
 
 ORBIT_REQUIREMENTS = [
-    "pystan @ git+https://github.com/stan-dev/pystan2.git@master#egg=pystan",
+    # "pystan @ git+https://github.com/stan-dev/pystan2.git@master#egg=pystan",
     "orbit-ml",
 ]
 
