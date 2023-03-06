@@ -39,7 +39,7 @@ setup(
     #     """,
     author="Benjamin Bluhm",
     license="BSD-3-Clause",
-    # license_files="LICENSE.txt",
+    license_files="LICENSE.txt",
     url="https://github.com/blue-pen-labs/mlflow-flavors",
     packages=find_packages(exclude=["tests", "tests.*"]),
     setup_requires=["setuptools", "wheel"],
