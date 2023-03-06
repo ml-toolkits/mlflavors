@@ -26,6 +26,7 @@ source activate mlflow-flavors-dev
 
 2. Install project locally:
 ```bash
+python -m pip install --upgrade pip
 pip install -e ".[dev,docs]"
 ```
 
