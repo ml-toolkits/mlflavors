@@ -14,14 +14,14 @@
 
 # mlflow-flavors
 
-> This package aims to provide MLflow custom model flavors for some popular machine learning libraries
+> This package provides MLflow custom flavors for some popular machine learning frameworks that are currently not available as MLflow built-in flavors.
 
 ## Local environment setup
 
 1. Instantiate a local Python environment via a tool of your choice. This example is based on `conda`, but you can use any environment management tool:
 ```bash
 conda create -n mlflow-flavors-dev python=3.9
-conda activate mlflow-flavors-dev
+source activate mlflow-flavors-dev
 ```
 
 2. Install project locally:
@@ -34,22 +34,22 @@ pip install -e ".[dev,docs]"
 pre-commit install
 ```
 
-## Build Sphinx documentation
+## Building package documentation
 
-To build Sphinx documentation cd into docs folder and run:
+Go to docs folder and run:
 ```
 make html
 ```
-Sphinx documentation can be viewed by opening `docs/build/html/index.html`in your browser.
+View docs by opening `docs/build/html/index.html` in your browser.
 
-To remove generated Sphinx documentation run:
+Clean up Sphinx build resources:
 ```
 clean html
 ```
 
-## Running unit tests
+## Running tests
 
-For unit testing, please use `pytest`:
+Use `pytest`:
 ```
 pytest tests/unit --cov
 ```

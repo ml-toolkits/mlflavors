@@ -26,12 +26,21 @@ DOC_REQUIREMENTS = [
 ]
 
 ORBIT_REQUIREMENTS = [
-    # "pystan @ git+https://github.com/stan-dev/pystan2.git@master#egg=pystan",
+    "pystan @ git+https://github.com/stan-dev/pystan2.git@master#egg=pystan",
     "orbit-ml",
 ]
 
 setup(
     name="mlflow_flavors",
+    # description="""
+    #     This package provides MLflow custom flavors for
+    #     some popular machine learning frameworks that
+    #     are currently not available as MLflow built-in flavors.
+    #     """,
+    author="Benjamin Bluhm",
+    license="BSD-3-Clause",
+    # license_files="LICENSE.txt",
+    url="https://github.com/blue-pen-labs/mlflow-flavors",
     packages=find_packages(exclude=["tests", "tests.*"]),
     setup_requires=["setuptools", "wheel"],
     install_requires=PACKAGE_REQUIREMENTS,
@@ -41,7 +50,5 @@ setup(
         "orbit": ORBIT_REQUIREMENTS,
     },
     version=__version__,
-    description="",
-    author="",
     include_package_data=True,
 )
