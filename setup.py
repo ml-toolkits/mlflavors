@@ -8,8 +8,6 @@ from mlflow_flavors import __version__
 PACKAGE_REQUIREMENTS = [
     "importlib-metadata",
     "mlflow-skinny",
-    # "Cython>=0.22",
-    # "numpy",
 ]
 
 DEV_REQUIREMENTS = [
