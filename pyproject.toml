@@ -1,9 +1,36 @@
-[build-system]
-# AVOID CHANGING REQUIRES: IT WILL BE UPDATED BY PYSCAFFOLD!
-requires = ["setuptools>=46.1.0", "setuptools_scm[toml]>=5"]
-build-backend = "setuptools.build_meta"
+[tool.pytest.ini_options]
+addopts = """
+    -s -p no:warnings
+    --ignore docs
+    --cov mlflow_flavors
+    --cov-report xml
+    --cov-report html
+"""
+log_cli = 1
+log_cli_level = "INFO"
+log_cli_format = "[pytest][%(asctime)s][%(levelname)s][%(module)s][%(funcName)s] %(message)s"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+log_level = "INFO"
 
-[tool.setuptools_scm]
-# For smarter version schemes and other configuration options,
-# check out https://github.com/pypa/setuptools_scm
-version_scheme = "no-guess-dev"
+[tool.coverage.run]
+branch = true
+source = [
+    "mlflow_flavors"
+]
+
+[tool.coverage.report]
+ignore_errors = true
+omit = [
+    "tests/*",
+    "setup.py",
+]
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+
+[tool.pydocstyle]
+convention = "numpy"
+match = '(?!test_|conftest).*\.py'
+add-ignore = ["D101","D104"]
