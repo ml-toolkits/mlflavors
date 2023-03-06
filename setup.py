@@ -33,9 +33,8 @@ ORBIT_REQUIREMENTS = [
 setup(
     name="mlflow_flavors",
     description="""
-        This package provides MLflow custom flavors for
-        some popular machine learning frameworks that
-        are currently not available as MLflow built-in flavors.
+        This package provides MLflow custom flavors for some popular machine learning
+        frameworks that are currently not available as MLflow built-in flavors.
         """,
     author="Benjamin Bluhm",
     license="BSD-3-Clause",
