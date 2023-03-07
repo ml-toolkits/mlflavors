@@ -10,7 +10,7 @@ from sktime.performance_metrics.forecasting import (
     mean_absolute_percentage_error,
 )
 
-import mlflow_flavors
+import mlflow_flavors.sktime
 
 ARTIFACT_PATH = "model"
 
