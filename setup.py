@@ -17,6 +17,7 @@ DEV_REQUIREMENTS = [
     "pytest-cov",
     "setuptools",
     "tomli",
+    "pmdarima",
 ]
 
 DOC_REQUIREMENTS = [
