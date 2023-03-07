@@ -20,7 +20,7 @@ from sktime.forecasting.arima import AutoARIMA
 from sktime.forecasting.model_selection import temporal_train_test_split
 from sktime.forecasting.naive import NaiveForecaster
 
-import mlflow_flavors
+import mlflow_flavors.sktime
 
 FH = [1, 2, 3]
 COVERAGE = [0.1, 0.5, 0.9]
