@@ -59,7 +59,7 @@ with mlflow.start_run() as run:
     mlflow.log_params(parameters)
     mlflow.log_metrics(metrics)
 
-    # Log model using custom model mlflow_flavors with pickle serialization (default).
+    # Log model using pickle serialization (default).
     mlflow_flavors.orbit.log_model(
         orbit=ets,
         artifact_path=ARTIFACT_PATH,

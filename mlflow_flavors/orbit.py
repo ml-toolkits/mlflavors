@@ -483,7 +483,7 @@ class _OrbitModelWrapper:
         store_prediction_array = attrs.get("store_prediction_array", False)
         seed = attrs.get("seed", None)
 
-        if not X:
+        if isinstance(X, type(None)):
             raise MlflowException(
                 f"The provided prediction configuration pd.DataFrame columns ({df_schema}) \
                 do not contain the required column `X` for specifying the regressor \
