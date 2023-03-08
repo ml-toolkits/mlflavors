@@ -9,6 +9,7 @@ PACKAGE_REQUIREMENTS = [
     "importlib-metadata",
     "numpy",
     "mlflow",
+    "scikit-learn",
 ]
 
 DEV_REQUIREMENTS = [

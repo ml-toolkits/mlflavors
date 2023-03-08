@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - refactor-orbit-flavor
     tags: ['v[0-9]*', '[0-9]+.[0-9]+*']
   pull_request:
     branches:
@@ -64,8 +65,10 @@ jobs:
 
     - name: Run examples
       run: |
-        echo "Running examples"
+        echo "Running Sktime example"
         python examples/sktime/train.py
+        echo "Running Orbit example"
+        python examples/orbit/train.py
 
   documentation:
     needs: examples

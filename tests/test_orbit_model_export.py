@@ -3,6 +3,7 @@ from unittest import mock
 
 import mlflow
 import numpy as np
+import pandas as pd
 import pytest
 from mlflow import pyfunc
 from mlflow.exceptions import MlflowException
@@ -15,7 +16,10 @@ from orbit.utils.dataset import load_iclaims
 from pandas.testing import assert_frame_equal
 
 import mlflow_flavors.orbit
-from mlflow_flavors.orbit import PYFUNC_PREDICT_CONF
+
+SEED = 2023
+DECOMPOSE = True
+STORE_PREDICTION_ARRAY = True
 
 
 @pytest.fixture
@@ -35,7 +39,7 @@ def orbit_custom_env(tmp_path):
 
 
 @pytest.fixture(scope="module")
-def test_data_iclaims():
+def data_iclaims():
     """Create sample data for orbit model."""
     df = load_iclaims()
     test_size = 52
@@ -45,9 +49,9 @@ def test_data_iclaims():
 
 
 @pytest.fixture(scope="module")
-def dlt_model(test_data_iclaims):
+def dlt_model(data_iclaims):
     """Create instance of fitted dlt model."""
-    train_df, _ = test_data_iclaims
+    train_df, _ = data_iclaims
     dlt = DLT(
         response_col="claims",
         date_col="week",
@@ -59,10 +63,10 @@ def dlt_model(test_data_iclaims):
 
 @pytest.mark.parametrize("serialization_format", ["pickle", "cloudpickle"])
 def test_dlt_model_save_and_load(
-    dlt_model, model_path, serialization_format, test_data_iclaims
+    dlt_model, model_path, serialization_format, data_iclaims
 ):
     """Test saving and loading of native orbit dlt model."""
-    _, test_df = test_data_iclaims
+    _, test_df = data_iclaims
     mlflow_flavors.orbit.save_model(
         orbit_model=dlt_model,
         path=model_path,
@@ -73,45 +77,16 @@ def test_dlt_model_save_and_load(
     )
 
     assert_frame_equal(
-        dlt_model.predict(test_df, seed=43), loaded_model.predict(test_df, seed=43)
+        dlt_model.predict(test_df, seed=SEED), loaded_model.predict(test_df, seed=SEED)
     )
 
 
 @pytest.mark.parametrize("serialization_format", ["pickle", "cloudpickle"])
-def test_dlt_model_pyfunc_without_params_output(
-    dlt_model, model_path, serialization_format, test_data_iclaims
-):
-    """Test dlt prediction of loaded pyfunc model without parameters."""
-    delattr(dlt_model, PYFUNC_PREDICT_CONF) if hasattr(
-        dlt_model, PYFUNC_PREDICT_CONF
-    ) else None
-
-    _, test_df = test_data_iclaims
-    mlflow_flavors.orbit.save_model(
-        orbit_model=dlt_model,
-        path=model_path,
-        serialization_format=serialization_format,
-    )
-    loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model(model_uri=model_path)
-
-    model_predictions = dlt_model.predict(test_df)
-    pyfunc_predict = loaded_pyfunc.predict(test_df)
-
-    assert len(model_predictions) == len(pyfunc_predict)
-
-
-@pytest.mark.parametrize("serialization_format", ["pickle", "cloudpickle"])
-def test_dlt_model_pyfunc_with_params_output(
-    dlt_model, model_path, serialization_format, test_data_iclaims
+def test_dlt_model_pyfunc_output(
+    dlt_model, model_path, serialization_format, data_iclaims
 ):
     """Test dlt prediction of loaded pyfunc model with parameters."""
-    _, test_df = test_data_iclaims
-
-    dlt_model.pyfunc_predict_conf = {
-        "decompose": True,
-        "store_prediction_array": True,
-        "seed": 43,
-    }
+    _, test_df = data_iclaims
     mlflow_flavors.orbit.save_model(
         orbit_model=dlt_model,
         path=model_path,
@@ -119,10 +94,26 @@ def test_dlt_model_pyfunc_with_params_output(
     )
     loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model(model_uri=model_path)
 
-    model_predictions = dlt_model.predict(
-        test_df, decompose=True, store_prediction_array=True, seed=43
+    X_test_array = test_df.to_numpy()
+    predict_conf = pd.DataFrame(
+        [
+            {
+                "X": X_test_array,
+                "X_cols": test_df.columns,
+                "decompose": DECOMPOSE,
+                "store_prediction_array": STORE_PREDICTION_ARRAY,
+                "seed": SEED,
+            }
+        ]
     )
-    pyfunc_predict = loaded_pyfunc.predict(test_df)
+
+    model_predictions = dlt_model.predict(
+        test_df,
+        decompose=DECOMPOSE,
+        store_prediction_array=STORE_PREDICTION_ARRAY,
+        seed=SEED,
+    )
+    pyfunc_predict = loaded_pyfunc.predict(predict_conf)
 
     assert_frame_equal(model_predictions, pyfunc_predict)
 
@@ -130,12 +121,12 @@ def test_dlt_model_pyfunc_with_params_output(
 @pytest.mark.parametrize("use_signature", [True, False])
 def test_signature_and_examples_saved_correctly(
     dlt_model,
-    test_data_iclaims,
+    data_iclaims,
     model_path,
     use_signature,
 ):
     """Test saving of mlflow signature for native orbit predict method."""
-    _, test_df = test_data_iclaims
+    _, test_df = data_iclaims
 
     # Note: Example inference fails due to incorrect recreation of numpy timestamp
     prediction = dlt_model.predict(test_df)
@@ -151,20 +142,31 @@ def test_signature_and_examples_saved_correctly(
 
 @pytest.mark.parametrize("use_signature", [True, False])
 def test_signature_for_pyfunc_predict(
-    dlt_model, model_path, test_data_iclaims, use_signature
+    dlt_model, model_path, data_iclaims, use_signature
 ):
     """Test saving of mlflow signature for pyfunc predict."""
-    _, test_df = test_data_iclaims
+    _, test_df = data_iclaims
 
     model_path_primary = model_path.joinpath("primary")
     model_path_secondary = model_path.joinpath("secondary")
-    dlt_model.pyfunc_predict_conf = {
-        "seed": 43,
-    }
+
     mlflow_flavors.orbit.save_model(orbit_model=dlt_model, path=model_path_primary)
     loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model(model_uri=model_path_primary)
 
-    forecast = loaded_pyfunc.predict(test_df)
+    X_test_array = test_df.to_numpy()
+    predict_conf = pd.DataFrame(
+        [
+            {
+                "X": X_test_array,
+                "X_cols": test_df.columns,
+                "decompose": DECOMPOSE,
+                "store_prediction_array": STORE_PREDICTION_ARRAY,
+                "seed": SEED,
+            }
+        ]
+    )
+
+    forecast = loaded_pyfunc.predict(predict_conf)
     signature = infer_signature(test_df, forecast) if use_signature else None
     mlflow_flavors.orbit.save_model(
         dlt_model,
@@ -178,10 +180,10 @@ def test_signature_for_pyfunc_predict(
 @pytest.mark.parametrize("should_start_run", [True, False])
 @pytest.mark.parametrize("serialization_format", ["pickle", "cloudpickle"])
 def test_log_model(
-    dlt_model, tmp_path, should_start_run, serialization_format, test_data_iclaims
+    dlt_model, tmp_path, should_start_run, serialization_format, data_iclaims
 ):
     """Test logging and reloading orbit model."""
-    _, test_df = test_data_iclaims
+    _, test_df = data_iclaims
 
     try:
         if should_start_run:
@@ -201,8 +203,8 @@ def test_log_model(
             model_uri=model_uri,
         )
         np.testing.assert_array_equal(
-            dlt_model.predict(test_df, seed=43),
-            reloaded_model.predict(test_df, seed=43),
+            dlt_model.predict(test_df, seed=SEED),
+            reloaded_model.predict(test_df, seed=SEED),
         )
         model_path = Path(_download_artifact_from_uri(artifact_uri=model_uri))
         model_config = Model.load(str(model_path.joinpath("MLmodel")))
@@ -232,69 +234,36 @@ def test_log_model_calls_register_model(dlt_model, tmp_path):
         )
 
 
-def test_pyfunc_raises_invalid_attribute_type(dlt_model, model_path, test_data_iclaims):
-    """Test pyfunc raises exception with invalid attribute type."""
-    _, test_df = test_data_iclaims
+def test_log_model_no_registered_model_name(dlt_model, tmp_path):
+    """Test log model calls register model without registered model name."""
+    artifact_path = "orbit"
+    register_model_patch = mock.patch("mlflow.register_model")
+    with mlflow.start_run(), register_model_patch:
+        conda_env = tmp_path.joinpath("conda_env.yaml")
+        _mlflow_conda_env(conda_env, additional_pip_deps=["orbit"])
+        mlflow_flavors.orbit.log_model(
+            orbit_model=dlt_model,
+            artifact_path=artifact_path,
+            conda_env=str(conda_env),
+        )
+        mlflow.register_model.assert_not_called()
 
-    dlt_model.pyfunc_predict_conf = ("seed", 43)
+
+def test_orbit_pyfunc_raises_invalid_df_input(dlt_model, model_path):
+    """Test pyfunc call raises error with invalid dataframe configuration."""
     mlflow_flavors.orbit.save_model(orbit_model=dlt_model, path=model_path)
     loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model(model_uri=model_path)
 
-    with pytest.raises(
-        MlflowException,
-        match=f"Attribute {PYFUNC_PREDICT_CONF} must be of type dict.",
-    ):
-        loaded_pyfunc.predict(test_df)
+    with pytest.raises(MlflowException, match="The provided prediction pd.DataFrame "):
+        loaded_pyfunc.predict(pd.DataFrame([{"decompose": DECOMPOSE}, {"seed": SEED}]))
+
+    with pytest.raises(MlflowException, match="The provided prediction configuration "):
+        loaded_pyfunc.predict(pd.DataFrame([{"invalid": True}]))
 
 
-def test_pyfunc_raises_invalid_decompose_type(dlt_model, model_path, test_data_iclaims):
-    """Test pyfunc raises exception with invalid decompose type."""
-    _, test_df = test_data_iclaims
-
-    dlt_model.pyfunc_predict_conf = {
-        "decompose": None,
-    }
-    mlflow_flavors.orbit.save_model(orbit_model=dlt_model, path=model_path)
-    loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model(model_uri=model_path)
-
-    with pytest.raises(
-        MlflowException,
-        match="The provided `decompose` value ",
-    ):
-        loaded_pyfunc.predict(test_df)
-
-
-def test_pyfunc_raises_invalid_store_prediction_array_type(
-    dlt_model, model_path, test_data_iclaims
-):
-    """Test pyfunc raises exception with invalid store_prediction_array type."""
-    _, test_df = test_data_iclaims
-
-    dlt_model.pyfunc_predict_conf = {
-        "store_prediction_array": None,
-    }
-    mlflow_flavors.orbit.save_model(orbit_model=dlt_model, path=model_path)
-    loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model(model_uri=model_path)
-
-    with pytest.raises(
-        MlflowException,
-        match="The provided `store_prediction_array` value ",
-    ):
-        loaded_pyfunc.predict(test_df)
-
-
-def test_pyfunc_raises_invalid_seed_type(dlt_model, model_path, test_data_iclaims):
-    """Test pyfunc raises exception with invalid store_prediction_array type."""
-    _, test_df = test_data_iclaims
-
-    dlt_model.pyfunc_predict_conf = {
-        "seed": "43",
-    }
-    mlflow_flavors.orbit.save_model(orbit_model=dlt_model, path=model_path)
-    loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model(model_uri=model_path)
-
-    with pytest.raises(
-        MlflowException,
-        match="The provided `seed` value ",
-    ):
-        loaded_pyfunc.predict(test_df)
+def test_orbit_save_model_raises_invalid_serialization_format(dlt_model, model_path):
+    """Test save_model call raises error with invalid serialization format."""
+    with pytest.raises(MlflowException, match="Unrecognized serialization format: "):
+        mlflow_flavors.orbit.save_model(
+            orbit_model=dlt_model, path=model_path, serialization_format="json"
+        )
