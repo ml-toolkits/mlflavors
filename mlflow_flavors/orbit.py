@@ -491,7 +491,7 @@ class _OrbitModelWrapper:
                 error_code=INVALID_PARAMETER_VALUE,
             )
 
-        if not X_cols:
+        if isinstance(X_cols, type(None)):
             raise MlflowException(
                 f"The provided prediction configuration pd.DataFrame columns ({df_schema}) \
                 do not contain the required column `X_cols` for specifying the \
