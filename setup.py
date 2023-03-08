@@ -7,7 +7,8 @@ from mlflow_flavors import __version__
 # packages for local development and unit testing
 PACKAGE_REQUIREMENTS = [
     "importlib-metadata",
-    "mlflow-skinny",
+    "numpy",
+    "mlflow",
 ]
 
 DEV_REQUIREMENTS = [
@@ -16,6 +17,7 @@ DEV_REQUIREMENTS = [
     "pytest-cov",
     "setuptools",
     "tomli",
+    "pmdarima",
 ]
 
 DOC_REQUIREMENTS = [
@@ -24,8 +26,11 @@ DOC_REQUIREMENTS = [
 ]
 
 ORBIT_REQUIREMENTS = [
-    # "pystan @ git+https://github.com/stan-dev/pystan2.git@master#egg=pystan",
     "orbit-ml",
+]
+
+SKTIME_REQUIREMENTS = [
+    "sktime[dl]==0.16.1",
 ]
 
 setup(
@@ -45,6 +50,7 @@ setup(
         "dev": DEV_REQUIREMENTS,
         "docs": DOC_REQUIREMENTS,
         "orbit": ORBIT_REQUIREMENTS,
+        "sktime": SKTIME_REQUIREMENTS,
     },
     version=__version__,
     include_package_data=True,

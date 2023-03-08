@@ -14,7 +14,7 @@ from orbit.models import DLT
 from orbit.utils.dataset import load_iclaims
 from pandas.testing import assert_frame_equal
 
-import mlflow_flavors
+import mlflow_flavors.orbit
 from mlflow_flavors.orbit import PYFUNC_PREDICT_CONF
 
 
