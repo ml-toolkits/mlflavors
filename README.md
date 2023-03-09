@@ -14,7 +14,7 @@
 
 # Mlflow-Flavors: A Python Package for hosting MLflow custom model flavors
 
-This package adds MLflow support for some popular machine learning frameworks that are currently not available as MLflow built-in model flavors. It provides an intuitive design that closely follows the interface of MLflow built-in model flavors.
+This package adds MLflow support for some popular machine learning frameworks that are currently not available as MLflow built-in model flavors. It provides an intuitive interface that closely follows MLflow built-in model flavors.
 
 ## Supported frameworks
 
