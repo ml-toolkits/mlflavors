@@ -42,7 +42,7 @@ with mlflow.start_run() as run:
     mlflow.log_params(parameters)
     mlflow.log_metrics(metrics)
 
-    # Log model using custom model mlflow_flavors with pickle serialization (default).
+    # Log model using pickle serialization (default).
     mlflow_flavors.sktime.log_model(
         sktime_model=forecaster,
         artifact_path=ARTIFACT_PATH,

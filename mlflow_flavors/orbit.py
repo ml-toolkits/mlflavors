@@ -1,35 +1,43 @@
-"""The ``mlflow_flavors.orbit`` module provides an MLflow API for ``orbit`` models.
+"""The ``flavor`` module provides an example for a custom model flavor for ``orbit`` library.
 
 This module exports ``orbit`` models in the following formats:
 
 orbit (native) format
-    This is the main flavor that can be loaded back into orbit, which relies on pickle
+    This is the main flavor that can be loaded back into ``orbit``, which relies on pickle
     internally to serialize a model.
+
+    Note that pickle serialization requires using the same python environment (version) in
+    whatever environment you're going to use this model for inference to ensure that the model
+    will load with appropriate version of pickle.
 mlflow.pyfunc
     Produced for use by generic pyfunc-based deployment tools and batch inference.
 
-    The `pyfunc` flavor of the model supports orbit `predict()` method.
+    The interface for utilizing a ``orbit`` model loaded as a ``pyfunc`` type for generating
+    forecast predictions uses a *single-row* ``Pandas DataFrame`` configuration argument. The
+    following columns in this configuration ``Pandas DataFrame`` are supported:
 
-    The interface for utilizing orbit models loaded as a `pyfunc` type for
-    generating forecasts requires passing an exogenous regressor as Pandas
-    DataFrame to the `pyfunc.predict()` method. The configuration of parameter
-    values passed to the predict method is defined by a dictionary to be saved
-    as an attribute of the fitted orbit model instance (for example
-    `{"decompose": True, "store_prediction_array": True, seed = 43}`). If no
-    prediction configuration is defined `pyfunc.predict()` will return output
-    from orbit `predict()` method using default parameter values.
-"""
-
-__author__ = ["benjaminbluhm"]
-__copyright__ = "Blue Pen Labs"
-__license__ = "BSD-3-Clause"
-
+    * ``X`` (required) - exogenous regressor values as a 2D numpy ndarray of values for future
+        time period events. For more information, read the underlying library explanation
+        https://orbit-ml.readthedocs.io/en/latest/.
+    * ``X_cols`` (required) - list with column names corresponding to ``X`` (required to construct
+        Pandas DataFrame inside model wrapper class).
+    * ``X_dtypes`` (required) - list with data types corresponding to ``X`` (required to construct
+        Pandas DataFrame inside model wrapper class).
+    * ``decompose`` (optional) - if True, returns each prediction component separately.
+        (Default: ``False``)
+    * ``store_prediction_array`` (optional) - if True, prediction array is stored.
+        (Default: ``False``)
+    * ``seed`` (optional) - seed in prediction is set to be random by default unless users provided
+        a fixed seed.
+        (Default: ``None``)
+"""  # noqa: E501
 import logging
 import os
 import pickle
 
 import mlflow
 import orbit
+import pandas as pd
 import yaml
 from mlflow import pyfunc
 from mlflow.exceptions import MlflowException
@@ -63,8 +71,6 @@ from mlflow.utils.requirements_utils import _get_pinned_requirement
 import mlflow_flavors
 
 FLAVOR_NAME = "orbit"
-
-PYFUNC_PREDICT_CONF = "pyfunc_predict_conf"
 
 SERIALIZATION_FORMAT_PICKLE = "pickle"
 SERIALIZATION_FORMAT_CLOUDPICKLE = "cloudpickle"
@@ -167,33 +173,6 @@ def save_model(
     serialization_format : str, optional (default="pickle")
         The format in which to serialize the model. This should be one of the formats
         "pickle" or "cloudpickle"
-
-    References
-    ----------
-    .. [1] https://www.mlflow.org/docs/latest/python_api/mlflow.models.html#mlflow.models.Model.save
-
-    Examples
-    --------
-    >>> import mlflow
-    >>> from mlflow.utils.environment import _mlflow_conda_env
-    >>> from orbit.utils.dataset import load_iclaims
-    >>> from orbit.models import DLT
-    >>> import mlflow_flavors
-    >>> df = load_iclaims()
-    >>> test_size = 52
-    >>> train_df = df[:-test_size]
-    >>> test_df = df[-test_size:]
-    >>> dlt = DLT(
-    ...     response_col='claims', date_col='week',
-    ...     regressor_col=['trend.unemploy', 'trend.filling', 'trend.job'],
-    ...     seasonality=52)
-    >>> dlt.fit(df=train_df)
-    >>> model_path = "model"
-    >>> mlflow_flavors.orbit.save_model(
-    ...     orbit_model=dlt,
-    ...     path=model_path)
-    >>> loaded_model = mlflow_flavors.orbit.load_model(model_uri=model_path)
-    >>> loaded_model.predict(test_df)
     """  # noqa: E501
     _validate_env_arguments(conda_env, pip_requirements, extra_pip_requirements)
 
@@ -236,7 +215,7 @@ def save_model(
     mlflow_model.add_flavor(
         FLAVOR_NAME,
         pickled_model=model_data_subpath,
-        sktime_version=orbit.__version__,
+        orbit_version=orbit.__version__,
         serialization_format=serialization_format,
         code=code_dir_subpath,
     )
@@ -354,31 +333,6 @@ def log_model(
     -------
     A :py:class:`ModelInfo <mlflow.models.model.ModelInfo>` instance that contains the
     metadata of the logged model.
-
-    See Also
-    --------
-    MLflow
-
-    References
-    ----------
-    .. [1] https://www.mlflow.org/docs/latest/python_api/mlflow.models.html#mlflow.models.Model.log
-
-    >>> import mlflow
-    >>> from mlflow.utils.environment import _mlflow_conda_env
-    >>> from orbit.utils.dataset import load_iclaims
-    >>> from orbit.models import DLT
-    >>> import mlflow_flavors
-    >>> df = load_iclaims()
-    >>> dlt = DLT(
-    ...     response_col='claims', date_col='week',
-    ...     regressor_col=['trend.unemploy', 'trend.filling', 'trend.job'],
-    ...     seasonality=52)
-    >>> dlt.fit(df=df)
-    >>> mlflow.start_run()
-    >>> artifact_path = "model"
-    >>> model_info = mlflow_flavors.orbit.log_model(
-    ...     orbit_model=dlt,
-    ...     artifact_path=artifact_path)
     """  # noqa: E501
     return Model.log(
         artifact_path=artifact_path,
@@ -423,31 +377,6 @@ def load_model(model_uri, dst_path=None):
     Returns
     -------
     A orbit model instance.
-
-    References
-    ----------
-    .. [1] https://www.mlflow.org/docs/latest/python_api/mlflow.models.html#mlflow.models.Model.load
-
-    Examples
-    --------
-    >>> from mlflow.utils.environment import _mlflow_conda_env
-    >>> from orbit.utils.dataset import load_iclaims
-    >>> from orbit.models import DLT
-    >>> import mlflow_flavors
-    >>> df = load_iclaims()
-    >>> test_size = 52
-    >>> train_df = df[:-test_size]
-    >>> test_df = df[-test_size:]
-    >>> dlt = DLT(
-    ...     response_col='claims', date_col='week',
-    ...     regressor_col=['trend.unemploy', 'trend.filling', 'trend.job'],
-    ...     seasonality=52)
-    >>> dlt.fit(df=train_df)
-    >>> model_path = "model"
-    >>> mlflow_flavors.orbit.save_model(
-    ...     orbit_model=dlt,
-    ...     path=model_path)
-    >>> loaded_model = mlflow_flavors.orbit.load_model(model_uri=model_path)
     """  # noqa: E501
     local_model_path = _download_artifact_from_uri(
         artifact_uri=model_uri, output_path=dst_path
@@ -513,14 +442,6 @@ def _load_pyfunc(path):
     ----------
     path : str
         Local filesystem path to the MLflow Model with the orbit flavor.
-
-    See Also
-    --------
-    MLflow
-
-    References
-    ----------
-    .. [1] https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_model
     """  # noqa: E501
     if os.path.isfile(path):
         serialization_format = SERIALIZATION_FORMAT_PICKLE
@@ -529,10 +450,10 @@ def _load_pyfunc(path):
         )
     else:
         try:
-            sktime_flavor_conf = _get_flavor_configuration(
+            orbit_flavor_conf = _get_flavor_configuration(
                 model_path=path, flavor_name=FLAVOR_NAME
             )
-            serialization_format = sktime_flavor_conf.get(
+            serialization_format = orbit_flavor_conf.get(
                 "serialization_format", SERIALIZATION_FORMAT_PICKLE
             )
         except MlflowException:
@@ -556,50 +477,60 @@ class _OrbitModelWrapper:
     def __init__(self, orbit_model):
         self.orbit_model = orbit_model
 
-    def predict(self, X):
-        if not hasattr(self.orbit_model, PYFUNC_PREDICT_CONF):
-            predictions = self.orbit_model.predict(X)
+    def predict(self, dataframe) -> pd.DataFrame:
+        df_schema = dataframe.columns.values.tolist()
 
-        else:
-            if not isinstance(self.orbit_model.pyfunc_predict_conf, dict):
-                raise MlflowException(
-                    f"Attribute {PYFUNC_PREDICT_CONF} must be of type dict.",
-                    error_code=INVALID_PARAMETER_VALUE,
-                )
-
-            decompose = self.orbit_model.pyfunc_predict_conf.get("decompose", False)
-            store_prediction_array = self.orbit_model.pyfunc_predict_conf.get(
-                "store_prediction_array", False
+        if len(dataframe) > 1:
+            raise MlflowException(
+                f"The provided prediction pd.DataFrame contains {len(dataframe)} rows. "
+                "Only 1 row should be supplied.",
+                error_code=INVALID_PARAMETER_VALUE,
             )
-            seed = self.orbit_model.pyfunc_predict_conf.get("seed", None)
 
-            if not isinstance(decompose, bool):
-                raise MlflowException(
-                    f"The provided `decompose` value {decompose} must be a bool."
-                    f"provided type: {type(decompose)}",
-                    error_code=INVALID_PARAMETER_VALUE,
-                )
+        attrs = dataframe.to_dict(orient="index").get(0)
+        X = attrs.get("X")
+        X_cols = attrs.get("X_cols")
+        X_dtypes = attrs.get("X_dtypes")
+        decompose = attrs.get("decompose", False)
+        store_prediction_array = attrs.get("store_prediction_array", False)
+        seed = attrs.get("seed", None)
 
-            if not isinstance(store_prediction_array, bool):
-                raise MlflowException(
-                    f"The provided `store_prediction_array` value "
-                    f"{store_prediction_array} must be a bool."
-                    f"provided type: {type(store_prediction_array)}",
-                    error_code=INVALID_PARAMETER_VALUE,
-                )
-
-            if not isinstance(seed, int):
-                raise MlflowException(
-                    f"The provided `seed` value {seed} must be an int."
-                    f"provided type: {type(seed)}",
-                    error_code=INVALID_PARAMETER_VALUE,
-                )
-
-            predictions = self.orbit_model.predict(
-                X,
-                decompose=decompose,
-                store_prediction_array=store_prediction_array,
-                seed=seed,
+        if isinstance(X, type(None)):
+            raise MlflowException(
+                f"The provided prediction configuration pd.DataFrame columns ({df_schema}) \
+                do not contain the required column `X` for specifying the regressor \
+                values.",
+                error_code=INVALID_PARAMETER_VALUE,
             )
+
+        if isinstance(X_cols, type(None)):
+            raise MlflowException(
+                f"The provided prediction configuration pd.DataFrame columns ({df_schema}) \
+                do not contain the required column `X_cols` for specifying the \
+                regressor columns.",
+                error_code=INVALID_PARAMETER_VALUE,
+            )
+
+        if isinstance(X_dtypes, type(None)):
+            raise MlflowException(
+                f"The provided prediction configuration pd.DataFrame columns ({df_schema}) \
+                do not contain the required column `X_dtypes` for specifying the \
+                regressor column types.",
+                error_code=INVALID_PARAMETER_VALUE,
+            )
+
+        # Create Pandas DataFrame as required by Orbit predict method
+        df = pd.DataFrame(data=X, columns=X_cols)
+
+        # Cast columns to correct type
+        for col, dtype in zip(X_cols, X_dtypes):
+            df[col] = df[col].astype(dtype)
+
+        predictions = self.orbit_model.predict(
+            df,
+            decompose=decompose,
+            store_prediction_array=store_prediction_array,
+            seed=seed,
+        )
 
         return predictions
