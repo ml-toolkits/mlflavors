@@ -61,7 +61,7 @@ with mlflow.start_run() as run:
 
     # Log model using pickle serialization (default).
     mlflow_flavors.orbit.log_model(
-        orbit=ets,
+        orbit_model=ets,
         artifact_path=ARTIFACT_PATH,
         serialization_format="pickle",
     )
