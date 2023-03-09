@@ -12,45 +12,99 @@
 
 [![tests](https://github.com/blue-pen-labs/mlflow-flavors/actions/workflows/ci.yml/badge.svg)](https://github.com/blue-pen-labs/mlflow-flavors/actions/workflows/ci.yml)
 
-# mlflow-flavors
+# Mlflow-Flavors: A Python Package for hosting MLflow custom model flavors
 
-> This package provides MLflow custom flavors for some popular machine learning frameworks that are currently not available as MLflow built-in flavors.
+This package adds MLflow support for some popular machine learning frameworks that are currently not available as MLflow built-in model flavors. It provides an intuitive design that closely follows the interface of MLflow built-in model flavors.
+
+## Supported frameworks
+
+| Framework | Links | Area |
+|---|---|---|
+| **Orbit** | [Example](examples/orbit/README.md) · [API Reference]() | Time Series
+| **Sktime** | [Example](examples/sktime/README.md) · [API Reference]() | Time Series  ||
+
+##  Installation
+
+Installing from PyPI with all flavors:
+
+```sh
+$ pip install mlflow-flavors[all]
+```
+Installing from PyPI with a particular flavor:
+
+```sh
+$ pip install mlflow-flavors[orbit]
+```
+
+## Quick Start
+
+Save an ``orbit`` ETS model as an artifact to MLflow:
+
+```python
+import mlflow_flavors
+
+from orbit.models import ETS
+from orbit.utils.dataset import load_iclaims
+
+df = load_iclaims()
+
+test_size = 52
+train_df = df[:-test_size]
+test_df = df[-test_size:]
+
+ets = ETS(
+    response_col="claims",
+    date_col="week",
+    seasonality=52,
+    seed=8888,
+)
+ets.fit(df=train_df)
+
+mlflow_flavors.orbit.save_model(
+    orbit_model=ets,
+    path="model",
+)
+
+loaded_model = mlflow_flavors.orbit.load_model("model")
+loaded_model.predict(test_df)
+```
+
+Refer to the [examples](examples) folder for more extended usage examples for the individual flavors.
+
+## Versioning
+
+We document versions and changes in our [changelog](CHANGELOG.md).
 
 ## Local environment setup
 
-1. Instantiate a local Python environment via a tool of your choice. This example is based on `conda`, but you can use any environment management tool:
-```bash
-conda create -n mlflow-flavors-dev python=3.9
-source activate mlflow-flavors-dev
+Instantiate a local Python environment, for example:
+
+```sh
+$ conda create -n mlflow-flavors-dev python=3.9
+$ source activate mlflow-flavors-dev
+```
+Install project locally:
+
+```sh
+$ python -m pip install --upgrade pip
+$ pip install -e ".[dev,docs]"
 ```
 
-2. Install project locally:
-```bash
-python -m pip install --upgrade pip
-pip install -e ".[dev,docs]"
+Install pre-commit hooks:
+
+```sh
+$ pre-commit install
 ```
 
-3. Install pre-commit hooks
-```bash
-pre-commit install
+Build package documentation
+
+```sh
+$ cd docs
+$ make html
 ```
 
-## Building package documentation
+Run tests
 
-Go to docs folder and run:
-```
-make html
-```
-View docs by opening `docs/build/html/index.html` in your browser.
-
-Clean up Sphinx build resources:
-```
-clean html
-```
-
-## Running tests
-
-Use `pytest`:
-```
-pytest tests/unit --cov
+```sh
+$ pytest tests/unit --cov
 ```

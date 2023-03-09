@@ -7,8 +7,7 @@ forecasting with exogenous variables.
 
 Run the `train.py` module to create a new MLflow experiment (that logs the training
 hyper-parameters, evaluation metrics and the trained model as an artifact) and to
-compute interval forecasts loading the trained model in native `sktime`
-flavor and `pyfunc` flavor:
+compute interval forecasts loading the trained model in native flavor and `pyfunc` flavor:
 
 ```
 python train.py
