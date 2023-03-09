@@ -1,25 +1,36 @@
-"""The ``mlflow_flavors.orbit`` module provides an MLflow API for ``orbit`` models.
+"""The ``flavor`` module provides an example for a custom model flavor for ``orbit`` library.
 
 This module exports ``orbit`` models in the following formats:
 
 orbit (native) format
-    This is the main flavor that can be loaded back into orbit, which relies on pickle
+    This is the main flavor that can be loaded back into ``orbit``, which relies on pickle
     internally to serialize a model.
+
+    Note that pickle serialization requires using the same python environment (version) in
+    whatever environment you're going to use this model for inference to ensure that the model
+    will load with appropriate version of pickle.
 mlflow.pyfunc
     Produced for use by generic pyfunc-based deployment tools and batch inference.
 
-    The `pyfunc` flavor of the model supports orbit `predict()` method.
+    The interface for utilizing a ``orbit`` model loaded as a ``pyfunc`` type for generating
+    forecast predictions uses a *single-row* ``Pandas DataFrame`` configuration argument. The
+    following columns in this configuration ``Pandas DataFrame`` are supported:
 
-    The interface for utilizing orbit models loaded as a `pyfunc` type for
-    generating forecasts requires passing an exogenous regressor as Pandas
-    DataFrame to the `pyfunc.predict()` method. The configuration of parameter
-    values passed to the predict method is defined by a dictionary to be saved
-    as an attribute of the fitted orbit model instance (for example
-    `{"decompose": True, "store_prediction_array": True, seed = 43}`). If no
-    prediction configuration is defined `pyfunc.predict()` will return output
-    from orbit `predict()` method using default parameter values.
-"""
-
+    * ``X`` (required) - exogenous regressor values as a 2D numpy ndarray of values for future
+        time period events. For more information, read the underlying library explanation
+        https://orbit-ml.readthedocs.io/en/latest/.
+    * ``X_cols`` (required) - list with column names corresponding to ``X`` (required to construct
+        Pandas DataFrame inside model wrapper class).
+    * ``X_dtypes`` (required) - list with data types corresponding to ``X`` (required to construct
+        Pandas DataFrame inside model wrapper class).
+    * ``decompose`` (optional) - if True, returns each prediction component separately.
+        (Default: ``False``)
+    * ``store_prediction_array`` (optional) - if True, prediction array is stored.
+        (Default: ``False``)
+    * ``seed`` (optional) - seed in prediction is set to be random by default unless users provided
+        a fixed seed.
+        (Default: ``None``)
+"""  # noqa: E501
 import logging
 import os
 import pickle
@@ -479,6 +490,7 @@ class _OrbitModelWrapper:
         attrs = dataframe.to_dict(orient="index").get(0)
         X = attrs.get("X")
         X_cols = attrs.get("X_cols")
+        X_dtypes = attrs.get("X_dtypes")
         decompose = attrs.get("decompose", False)
         store_prediction_array = attrs.get("store_prediction_array", False)
         seed = attrs.get("seed", None)
@@ -499,16 +511,20 @@ class _OrbitModelWrapper:
                 error_code=INVALID_PARAMETER_VALUE,
             )
 
+        if isinstance(X_dtypes, type(None)):
+            raise MlflowException(
+                f"The provided prediction configuration pd.DataFrame columns ({df_schema}) \
+                do not contain the required column `X_dtypes` for specifying the \
+                regressor column types.",
+                error_code=INVALID_PARAMETER_VALUE,
+            )
+
         # Create Pandas DataFrame as required by Orbit predict method
         df = pd.DataFrame(data=X, columns=X_cols)
 
-        # When the model is served via REST API the exogenous regressor must be
-        # provided as a list to the configuration DataFrame to be JSON serializable
-        # where the datetime entries of date_col are of string type. Below we convert
-        # back the date_col to datetime format as required by orbit predict method.
-        df[self.orbit_model.date_col] = df[self.orbit_model.date_col].astype(
-            "datetime64[ns]"
-        )
+        # Cast columns to correct type
+        for col, dtype in zip(X_cols, X_dtypes):
+            df[col] = df[col].astype(dtype)
 
         predictions = self.orbit_model.predict(
             df,

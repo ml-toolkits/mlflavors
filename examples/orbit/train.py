@@ -82,6 +82,7 @@ predict_conf = pd.DataFrame(
         {
             "X": X_test_array,
             "X_cols": test_df.columns,
+            "X_dtypes": list(test_df.dtypes),
             "decompose": True,
             "store_prediction_array": True,
             "seed": 2023,

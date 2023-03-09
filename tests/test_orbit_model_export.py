@@ -100,6 +100,7 @@ def test_dlt_model_pyfunc_output(
             {
                 "X": X_test_array,
                 "X_cols": test_df.columns,
+                "X_dtypes": list(test_df.dtypes),
                 "decompose": DECOMPOSE,
                 "store_prediction_array": STORE_PREDICTION_ARRAY,
                 "seed": SEED,
@@ -159,6 +160,7 @@ def test_signature_for_pyfunc_predict(
             {
                 "X": X_test_array,
                 "X_cols": test_df.columns,
+                "X_dtypes": list(test_df.dtypes),
                 "decompose": DECOMPOSE,
                 "store_prediction_array": STORE_PREDICTION_ARRAY,
                 "seed": SEED,
