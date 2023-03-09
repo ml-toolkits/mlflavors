@@ -20,8 +20,8 @@ This package adds MLflow support for some popular machine learning frameworks th
 
 | Framework | Links | Area |
 |---|---|---|
-| **Orbit** | [Example](examples/orbit/README.md) · [API Reference]() | Time Series
-| **Sktime** | [Example](examples/sktime/README.md) · [API Reference]() | Time Series  ||
+| **Orbit** | [Example](examples/orbit/README.md) | Time Series
+| **Sktime** | [Example](examples/sktime/README.md) | Time Series  ||
 
 ##  Installation
 
