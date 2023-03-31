@@ -14,14 +14,14 @@
 
 # mlflow-flavors
 
-This package adds support for MLflow tracking of some popular machine learning frameworks currently not available as MLflow built-in flavors. A usage example for each custom flavor in this package is provided in the examples directory. 
+This package adds MLflow support for some popular machine learning frameworks currently not available as MLflow built-in flavors. A usage example for each custom flavor in this package is provided in the examples directory. 
 
 ## Supported frameworks
 
 | Framework | Links | Area |
 |---|---|---|
-| [**Orbit**](https://github.com/uber/orbit) | [Example](examples/orbit/README.md) | Time Series
-| [**Sktime**](https://github.com/sktime/sktime) | [Example](examples/sktime/README.md) | Time Series  ||
+| [Orbit](https://github.com/uber/orbit) | [Example](examples/orbit/README.md) | Time Series
+| [Sktime](https://github.com/sktime/sktime) | [Example](examples/sktime/README.md) | Time Series  ||
 
 ##  Installation
 
