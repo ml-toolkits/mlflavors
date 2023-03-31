@@ -12,9 +12,9 @@
 
 [![tests](https://github.com/blue-pen-labs/mlflow-flavors/actions/workflows/ci.yml/badge.svg)](https://github.com/blue-pen-labs/mlflow-flavors/actions/workflows/ci.yml)
 
-# Mlflow-Flavors: A Python Package for hosting MLflow custom model flavors
+# mlflow-flavors
 
-This package adds MLflow support for some popular machine learning frameworks that are currently not available as MLflow built-in model flavors. It provides an intuitive interface that closely follows MLflow built-in model flavors.
+This package adds support for MLflow tracking of some popular machine learning frameworks currently not available as MLflow built-in flavors. A usage example for each custom flavor in this package is provided in the examples directory. 
 
 ## Supported frameworks
 
