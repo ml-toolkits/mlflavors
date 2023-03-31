@@ -30,7 +30,7 @@ Installing from PyPI with all flavors:
 ```sh
 $ pip install mlflow-flavors[all]
 ```
-Installing from PyPI with a particular flavor:
+Installing a particular flavor:
 
 ```sh
 $ pip install mlflow-flavors[orbit]
@@ -64,12 +64,41 @@ mlflow_flavors.orbit.save_model(
     orbit_model=ets,
     path="model",
 )
+```
 
+Make a prediction loading the model in native format:
+
+```python
 loaded_model = mlflow_flavors.orbit.load_model("model")
 loaded_model.predict(test_df)
 ```
 
-Refer to the [examples](examples) folder for more extended usage examples for the individual flavors.
+Make a prediction loading the model in ``pyfunc`` format:
+
+```python
+# Convert test data to 2D numpy array so it can be passed to pyfunc predict using
+# a single-row Pandas DataFrame configuration argument
+X_test_array = test_df.to_numpy()
+
+# Create configuration DataFrame
+predict_conf = pd.DataFrame(
+    [
+        {
+            "X": X_test_array,
+            "X_cols": test_df.columns,
+            "X_dtypes": list(test_df.dtypes),
+            "decompose": True,
+            "store_prediction_array": True,
+            "seed": 2023,
+        }
+    ]
+)
+
+loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model("model")
+loaded_pyfunc.predict(test_df)
+```
+
+Refer to the [examples](examples) folder for extended usage examples of the individual flavors.
 
 ## Versioning
 
