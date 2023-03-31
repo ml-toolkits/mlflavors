@@ -20,8 +20,8 @@ This package adds support for MLflow tracking of some popular machine learning f
 
 | Framework | Links | Area |
 |---|---|---|
-| **Orbit** | [Example](examples/orbit/README.md) | Time Series
-| **Sktime** | [Example](examples/sktime/README.md) | Time Series  ||
+| [**Orbit**](https://github.com/uber/orbit) | [Example](examples/orbit/README.md) | Time Series
+| [**Sktime**](https://github.com/sktime/sktime) | [Example](examples/sktime/README.md) | Time Series  ||
 
 ##  Installation
 
