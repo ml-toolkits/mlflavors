@@ -6,7 +6,7 @@ source = mlflow_flavors
 
 [paths]
 source =
-    src/
+    mlflow_flavors/
     */site-packages/
 
 [report]
