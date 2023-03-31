@@ -14,7 +14,7 @@
 
 # mlflow-flavors
 
-This package adds MLflow support for some popular machine learning frameworks currently not available as MLflow built-in flavors. A usage example for each custom flavor in this package is provided in the examples directory. 
+This package adds MLflow support for some popular machine learning frameworks currently not available as MLflow built-in flavors. A usage example for each framework is provided in the [examples](examples) folder.
 
 ## Supported frameworks
 
@@ -70,7 +70,12 @@ Make a prediction loading the model in native format:
 
 ```python
 loaded_model = mlflow_flavors.orbit.load_model("model")
-loaded_model.predict(test_df)
+loaded_model.predict(
+     test_df, 
+     decompose=True, 
+     store_prediction_array=True, 
+     seed=2023
+)
 ```
 
 Make a prediction loading the model in ``pyfunc`` format:
@@ -95,10 +100,8 @@ predict_conf = pd.DataFrame(
 )
 
 loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model("model")
-loaded_pyfunc.predict(test_df)
+loaded_pyfunc.predict(predict_conf)
 ```
-
-Refer to the [examples](examples) folder for extended usage examples of the individual flavors.
 
 ## Versioning
 
