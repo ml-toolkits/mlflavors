@@ -22,6 +22,7 @@ DEV_REQUIREMENTS = [
 ]
 
 DOC_REQUIREMENTS = [
+    "nbsphinx",
     "sphinx_rtd_theme==1.1.1",
     "sphinx==5.3.0",
 ]

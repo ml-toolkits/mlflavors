@@ -39,12 +39,3 @@ served model (for more details read the
 ```
 python score_model.py
 ```
-
-## Running the code as a project
-
-You can also run the code as a project as follows:
-
-```
-mlflow run .
-
-```
