@@ -12,9 +12,6 @@ Run the ``train.py`` module to create a new MLflow experiment (that logs the tra
 hyper-parameters, evaluation metrics and the trained model as an artifact) and to
 compute interval forecasts loading the trained model in native flavor and ``pyfunc`` flavor:
 
-.. include:: ../examples/orbit/train.py
-   :code: python
-
 .. include:: train.py
    :code: python
 
