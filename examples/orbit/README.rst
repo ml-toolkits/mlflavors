@@ -5,14 +5,17 @@ This example trains an ``orbit`` Bayesian ETS model using the iclaims dataset wh
 the weekly initial claims for US unemployment benefits against a few related Google
 trend queries from Jan 2010 - June 2018.
 
-Running the code
-~~~~~~~~~~~~~~~~
+Model logging and loading
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Run the ``train.py`` module to create a new MLflow experiment (that logs the training
 hyper-parameters, evaluation metrics and the trained model as an artifact) and to
 compute interval forecasts loading the trained model in native flavor and ``pyfunc`` flavor:
 
 .. include:: ../examples/orbit/train.py
+   :code: python
+
+.. include:: train.py
    :code: python
 
 To view the newly created experiment and logged artifacts open the MLflow UI:
@@ -38,4 +41,7 @@ served model (for more details read the
 `Deploy MLflow models <https://mlflow.org/docs/latest/models.html#deploy-mlflow-models>`_ section in the official MLflow docs):
 
 .. include:: ../examples/orbit/score_model.py
+   :code: python
+
+.. include:: score_model.py
    :code: python
