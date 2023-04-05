@@ -1,7 +1,10 @@
 mlflow-flavors Documentation
 ===================================
 This package adds MLflow support for some popular machine learning frameworks currently not available as MLflow built-in flavors.
-A usage example for each framework is provided in the `examples folder <https://github.com/blue-pen-labs/mlflow-flavors/tree/main/examples>`_.
+The MLflow interface for the supported frameworks follows the design of built-in flavors.
+
+Using this package you can save your model as an MLflow artifact, load your model from MLflow for batch inference,
+or serve your model for real-time inference to a REST API endpoint.
 
 .. toctree::
    :maxdepth: 2

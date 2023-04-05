@@ -2,17 +2,24 @@
 mlflow-flavors
 ==============
 
-This package adds MLflow support for some popular machine learning frameworks currently not available as MLflow built-in flavors.
-A usage example for each framework is provided in the `examples <https://github.com/blue-pen-labs/mlflow-flavors/tree/main/examples>`_ folder.
+This package adds MLflow support for some popular machine learning frameworks currently
+not available as MLflow built-in flavors. The MLflow interface for the supported
+frameworks follows the design of built-in flavors.
+
+Using this package you can save your model as an MLflow artifact, load your model from
+MLflow for batch inference, or serve your model for real-time inference to a REST API
+endpoint.
+
 
 Supported frameworks
 --------------------
+The following open-source libraris are currently supported:
 
 =================================================== ========================================================================================= ===============================
 Framework                                           Quickstart                                                                                Area
 =================================================== ========================================================================================= ===============================
-`Orbit <https://github.com/uber/orbit>`_            `Example <https://github.com/blue-pen-labs/mlflow-flavors/tree/main/examples/orbit>`_     Time Series
-`Sktime <https://github.com/sktime/sktime>`_        `Example <https://github.com/blue-pen-labs/mlflow-flavors/tree/main/examples/sktime>`_    Time Series
+`Orbit <https://github.com/uber/orbit>`_            `Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#orbit>`_          Time Series
+`Sktime <https://github.com/sktime/sktime>`_        `Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#sktime>`_         Time Series
 =================================================== ========================================================================================= ===============================
 
 Installation
@@ -30,8 +37,8 @@ Installing a particular flavor:
 
     $ pip install mlflow-flavors[orbit]
 
-Quickstart example
-------------------
+Quickstart
+----------
 
 Save an ``orbit`` ETS model as an artifact to MLflow:
 
@@ -61,14 +68,14 @@ Save an ``orbit`` ETS model as an artifact to MLflow:
         path="model",
     )
 
-Make a prediction loading the model in native format:
+Make a prediction loading the model from MLflow in native format:
 
 .. code-block:: python
 
     loaded_model = mlflow_flavors.orbit.load_model("model")
     loaded_model.predict(test_df, decompose=True, store_prediction_array=True, seed=2023)
 
-Make a prediction loading the model in ``pyfunc`` format:
+Make a prediction loading the model from MLflow in ``pyfunc`` format:
 
 .. code-block:: python
 
@@ -96,18 +103,25 @@ Make a prediction loading the model in ``pyfunc`` format:
 Documentation
 -------------
 
+Documentation, examples, and API reference for mlflow-flavors can be found
+`here <https://mlflow-flavors.readthedocs.io/en/latest/index.html>`_.
+
 Contributing
 ------------
+
+We welcome contributions from the community. To open an issue or request a new feature,
+please open a GitHub issue.
 
 Versioning
 ----------
 
-We document versions and changes in our `changelog <https://github.com/blue-pen-labs/mlflow-flavors/tree/main/CHANGELOG.rst>`_ .
+We document versions and changes in our
+`changelog <https://github.com/blue-pen-labs/mlflow-flavors/tree/main/CHANGELOG.rst>`_ .
 
-Development environment
------------------------
+Development
+-----------
 
-Instantiate a local Python environment, for example:
+To set up your local development environment, create a virtual environment, such as:
 
 .. code-block:: bash
 
@@ -127,15 +141,15 @@ Install pre-commit hooks:
 
     $ pre-commit install
 
-Build package documentation
+Run tests:
+
+.. code-block:: bash
+
+    $ pytest tests/unit --cov
+
+Build package documentation:
 
 .. code-block:: bash
 
     $ cd docs
     $ make html
-
-Run tests
-
-.. code-block:: bash
-
-    $ pytest tests/unit --cov

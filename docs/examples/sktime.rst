@@ -4,8 +4,8 @@ Sktime
 This example trains a ``Sktime`` NaiveForecaster model using the Longley dataset for
 forecasting with exogenous variables.
 
-Running the code
-~~~~~~~~~~~~~~~~
+Model logging and loading
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Run the ``train.py`` module to create a new MLflow experiment (that logs the training
 hyper-parameters, evaluation metrics and the trained model as an artifact) and to

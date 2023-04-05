@@ -12,8 +12,8 @@ Run the ``train.py`` module to create a new MLflow experiment (that logs the tra
 hyper-parameters, evaluation metrics and the trained model as an artifact) and to
 compute interval forecasts loading the trained model in native flavor and ``pyfunc`` flavor:
 
-.. include:: train.py
-   :code: python
+.. include:: ../examples/orbit/train.py
+    :code: python
 
 To view the newly created experiment and logged artifacts open the MLflow UI:
 
@@ -38,7 +38,4 @@ served model (for more details read the
 `Deploy MLflow models <https://mlflow.org/docs/latest/models.html#deploy-mlflow-models>`_ section in the official MLflow docs):
 
 .. include:: ../examples/orbit/score_model.py
-   :code: python
-
-.. include:: score_model.py
    :code: python

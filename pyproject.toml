@@ -33,4 +33,4 @@ line_length = 88
 [tool.pydocstyle]
 convention = "numpy"
 match = '(?!test_|conftest).*\.py'
-add-ignore = ["D100", "D101","D104"]
+add-ignore = ["D100", "D101","D104", "D205", "D400"]

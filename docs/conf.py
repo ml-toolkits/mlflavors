@@ -25,10 +25,12 @@ project = "mlflow-flavors"
 project_copyright = "Blue Pen Labs"
 author = "Blue Pen Labs"
 
-# import mlflow_flavors.version
+from mlflow_flavors.version import __version__
 
+# The short X.Y version.
+version = __version__
 # The full version, including alpha/beta/rc tags
-# release = mlflow_flavors.version.VERSION
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -39,8 +41,10 @@ author = "Blue Pen Labs"
 extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
+    "sphinx.ext.coverage",
     "sphinx.ext.viewcode",
     "nbsphinx",
+    "numpydoc",
 ]
 
 # Add any paths that contain templates here, relative to this directory.

@@ -1,4 +1,14 @@
 API reference
 =============
 
-py:module:`mlflow_flavors`
+Orbit
+-----
+
+.. automodule:: mlflow_flavors.orbit
+    :members:
+
+Sktime
+------
+
+.. automodule:: mlflow_flavors.sktime
+    :members:
