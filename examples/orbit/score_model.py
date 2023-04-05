@@ -22,7 +22,7 @@ X_test_list = test_df_pyfunc.to_numpy().tolist()
 # Convert index to list of strings for JSON serialization
 X_cols = list(test_df.columns)
 
-# Convert to dtypes to string for JSON serialization
+# Convert dtypes to string for JSON serialization
 X_dtypes = [str(dtype) for dtype in list(test_df.dtypes)]
 
 predict_conf = pd.DataFrame(

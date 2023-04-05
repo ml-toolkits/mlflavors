@@ -1,5 +1,3 @@
-__version__ = "0.0.1"
-
 try:
     from mlflow_flavors import orbit  # noqa: F401
     from mlflow_flavors import sktime  # noqa: F401
