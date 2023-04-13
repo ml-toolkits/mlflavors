@@ -15,12 +15,22 @@ Supported frameworks
 --------------------
 The following open-source libraris are currently supported:
 
-=================================================== ========================================================================================= ===============================
-Framework                                           Quickstart                                                                                Area
-=================================================== ========================================================================================= ===============================
-`Orbit <https://github.com/uber/orbit>`_            `Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#orbit>`_          Time Series
-`Sktime <https://github.com/sktime/sktime>`_        `Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#sktime>`_         Time Series
-=================================================== ========================================================================================= ===============================
+    .. list-table::
+      :widths: 15 10 15
+      :header-rows: 1
+
+      * - Framework
+        - Quickstart
+        - Category
+      * - `Orbit <https://github.com/uber/orbit>`_
+        - `Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#orbit>`_
+        - Time Series Forecasting
+      * - `Sktime <https://github.com/sktime/sktime>`_
+        - `Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#sktime>`_
+        - Time Series Forecasting
+      * - `StatsForecast <https://github.com/Nixtla/statsforecast>`_
+        - `Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#statsforecast>`_
+        - Time Series Forecasting
 
 Installation
 ------------

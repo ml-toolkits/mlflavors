@@ -13,6 +13,7 @@ PACKAGE_REQUIREMENTS = [
 ]
 
 DEV_REQUIREMENTS = [
+    "datasetsforecast==0.0.8",
     "pre-commit",
     "pytest",
     "pytest-cov",
@@ -34,6 +35,10 @@ ORBIT_REQUIREMENTS = [
 
 SKTIME_REQUIREMENTS = [
     "sktime",
+]
+
+STATSFORECAST_REQUIREMENTS = [
+    "statsforecast",
 ]
 
 setup(
@@ -59,6 +64,7 @@ setup(
         "docs": DOC_REQUIREMENTS,
         "orbit": ORBIT_REQUIREMENTS,
         "sktime": SKTIME_REQUIREMENTS,
+        "statsforecast": STATSFORECAST_REQUIREMENTS,
     },
     version=__version__,
     keywords="machine-learning ai mlflow",

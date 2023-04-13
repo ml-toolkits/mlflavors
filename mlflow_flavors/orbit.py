@@ -25,29 +25,29 @@ orbit (native) format
       * - Column
         - Type
         - Description
-      * - X (required)
-        - numpy ndarray or list
+      * - X
+        - numpy ndarray or list (required)
         - | Exogenous regressor for future time period events.
           | For more information, read the underlying library explanation:
           | https://orbit-ml.readthedocs.io/en/latest/.
-      * - X_cols (required)
-        - list
+      * - X_cols
+        - list (required)
         - | Column names of the exogenous regressor matrix
           | (Required to construct Pandas DataFrame inside model wrapper class).
       * - X_dtypes (required)
-        - list
+        - list (required)
         - | Data types of the exogenous regressor matrix
           | (Required to construct Pandas DataFrame inside model wrapper class).
-      * - decompose (optional)
-        - bool
+      * - decompose
+        - bool (optional)
         - | If True, returns each prediction component separately.
           | (Default: ``False``)
-      * - store_prediction_array (optional)
-        - bool
+      * - store_prediction_array
+        - bool (optional)
         - | If True, prediction array is stored.
           | (Default: ``False``)
-      * - seed (optional)
-        - int
+      * - seed
+        - int (optional)
         - | Seed in prediction is set to be random by default unless provided.
           | (Default: ``None``)
 """  # noqa: E501

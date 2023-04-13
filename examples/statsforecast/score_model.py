@@ -1,29 +1,29 @@
 import pandas as pd
 import requests
-from orbit.utils.dataset import load_iclaims
 
-df = load_iclaims()
-test_size = 52
-test_df = df[-test_size:]
+from mlflow_flavors.utils.data import load_m5
+
+DATA_PATH = "./data"
+HORIZON = 28
+LEVEL = [90, 95]
+_, X_test, _ = load_m5(DATA_PATH)
 
 # Define local host and endpoint url
 host = "127.0.0.1"
 url = f"http://{host}:5000/invocations"
 
 # Convert DateTime to string for JSON serialization
-test_df_pyfunc = test_df.copy()
-test_df_pyfunc["week"] = test_df_pyfunc["week"].dt.strftime(
-    date_format="%Y-%m-%d %H:%M:%S"
-)
+X_test_pyfunc = X_test.copy()
+X_test_pyfunc["ds"] = X_test_pyfunc["ds"].dt.strftime(date_format="%Y-%m-%d")
 
 # Convert to list for JSON serialization
-X_test_list = test_df_pyfunc.to_numpy().tolist()
+X_test_list = X_test_pyfunc.to_numpy().tolist()
 
 # Convert index to list of strings for JSON serialization
-X_cols = list(test_df.columns)
+X_cols = list(X_test.columns)
 
 # Convert dtypes to string for JSON serialization
-X_dtypes = [str(dtype) for dtype in list(test_df.dtypes)]
+X_dtypes = [str(dtype) for dtype in list(X_test.dtypes)]
 
 predict_conf = pd.DataFrame(
     [
@@ -31,9 +31,8 @@ predict_conf = pd.DataFrame(
             "X": X_test_list,
             "X_cols": X_cols,
             "X_dtypes": X_dtypes,
-            "decompose": True,
-            "store_prediction_array": True,
-            "seed": 2023,
+            "h": HORIZON,
+            "level": LEVEL,
         }
     ]
 )
