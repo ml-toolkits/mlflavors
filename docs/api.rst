@@ -12,3 +12,10 @@ Sktime
 
 .. automodule:: mlflow_flavors.sktime
     :members:
+
+
+StatsForecast
+-------------
+
+.. automodule:: mlflow_flavors.statsforecast
+    :members:

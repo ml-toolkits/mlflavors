@@ -1,25 +1,32 @@
-Sktime
-------
+StatsForecast
+-------------
 
-This example trains a `Sktime <https://github.com/sktime/sktime>`_ NaiveForecaster model
-using the Longley dataset for forecasting with exogenous variables.
+This example trains a
+`StatsForecast <https://github.com/Nixtla/statsforecast>`_
+AutoARIMA model using the M5 Competition  dataset. This dataset contains the daily sales
+of a product in a Walmart store and some exogenous regressors.
+
+To run this example you need to install the ``datasetsforecast`` library
+
+.. code-block:: bash
+
+    datasetsforecast==0.0.8
 
 Model logging and loading
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Run the ``train.py`` module to create a new MLflow experiment (that logs the training
 hyper-parameters, evaluation metrics and the trained model as an artifact) and to
-compute interval forecasts loading the trained model in native flavor and ``pyfunc`` flavor:
+compute forecasts loading the trained model in native flavor and ``pyfunc`` flavor:
 
-.. include:: ../examples/sktime/train.py
-   :code: python
+.. include:: ../examples/statsforecast/train.py
+    :code: python
 
 To view the newly created experiment and logged artifacts open the MLflow UI:
 
 .. code-block:: bash
 
     mlflow ui
-
 
 Model serving
 ~~~~~~~~~~~~~
@@ -34,7 +41,7 @@ of the ``train.py`` module:
     mlflow models serve -m runs:/<run_id>/model --env-manager local --host 127.0.0.1
 
 Open a new terminal and run the ``score_model.py`` module to request a prediction from
-thebserved model:
+the served model:
 
-.. include:: ../examples/sktime/score_model.py
+.. include:: ../examples/statsforecast/score_model.py
    :code: python

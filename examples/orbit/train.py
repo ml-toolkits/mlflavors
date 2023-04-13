@@ -75,8 +75,7 @@ loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model(model_uri=model_uri)
 # a single-row Pandas DataFrame configuration argument
 X_test_array = test_df.to_numpy()
 
-# Create configuration DataFrame for forecast with required parameters (X, X_cols),
-# optional parameters, and regressor term.
+# Create configuration DataFrame
 predict_conf = pd.DataFrame(
     [
         {
