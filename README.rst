@@ -23,14 +23,17 @@ The following open-source libraris are currently supported:
         - Quickstart
         - Category
       * - `Orbit <https://github.com/uber/orbit>`_
-        - `Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#orbit>`_
+        - `MLflow-Orbit Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#orbit>`_
         - Time Series Forecasting
       * - `Sktime <https://github.com/sktime/sktime>`_
-        - `Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#sktime>`_
+        - `MLflow-Sktime Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#sktime>`_
         - Time Series Forecasting
       * - `StatsForecast <https://github.com/Nixtla/statsforecast>`_
-        - `Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#statsforecast>`_
+        - `MLflow-StatsForecast Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#statsforecast>`_
         - Time Series Forecasting
+      * - `PyOD <https://github.com/yzhao062/pyod>`_
+        - `MLflow-PyOD Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#pyod>`_
+        - Anomaly Detection
 
 Installation
 ------------

@@ -19,3 +19,10 @@ StatsForecast
 
 .. automodule:: mlflow_flavors.statsforecast
     :members:
+
+
+PyOD
+----
+
+.. automodule:: mlflow_flavors.pyod
+    :members:

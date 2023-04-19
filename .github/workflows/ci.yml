@@ -40,7 +40,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -e ".[dev, orbit, sktime, statsforecast]"
+        pip install -e ".[dev, orbit, sktime, statsforecast, pyod]"
 
     - name: Run unit tests
       run: |
@@ -60,14 +60,21 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -e ".[dev, orbit, sktime, statsforecast]"
+        pip install -e ".[dev, orbit, sktime, statsforecast, pyod]"
 
     - name: Run examples
       run: |
-        echo "Running Sktime example"
-        python examples/sktime/train.py
         echo "Running Orbit example"
         python examples/orbit/train.py
+
+        echo "Running Sktime example"
+        python examples/sktime/train.py
+
+        echo "Running StatsForecast example"
+        python examples/statsforecast/train.py
+
+        echo "Running PyOD example"
+        python examples/pyod/train.py
 
   documentation:
     needs: examples
