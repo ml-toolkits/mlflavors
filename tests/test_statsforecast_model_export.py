@@ -40,8 +40,6 @@ def data_path(tmpdir_factory):
 @pytest.fixture
 def statsforecast_custom_env(tmp_path):
     """Create a conda environment and returns path to conda environment yml file."""
-    from mlflow.utils.environment import _mlflow_conda_env
-
     conda_env = tmp_path.joinpath("conda_env.yml")
     _mlflow_conda_env(conda_env, additional_pip_deps=["statsforecast"])
     return conda_env
@@ -66,7 +64,7 @@ def data_m5(data_path):
 
 @pytest.fixture(scope="module")
 def arima_ets_model(data_air_passengers):
-    """Create instance of fitted dlt model."""
+    """Create instance of statsforecast model."""
     train_df, _ = data_air_passengers
 
     models = [
@@ -81,7 +79,7 @@ def arima_ets_model(data_air_passengers):
 
 @pytest.fixture(scope="module")
 def arima_ets_fitted_model(data_air_passengers):
-    """Create instance of fitted dlt model."""
+    """Create instance of fitted statsforecast model."""
     train_df, _ = data_air_passengers
 
     models = [
@@ -378,7 +376,9 @@ def test_log_model_no_registered_model_name(arima_ets_fitted_model, tmp_path):
         mlflow.register_model.assert_not_called()
 
 
-def test_orbit_pyfunc_raises_invalid_df_input(arima_ets_fitted_model, model_path):
+def test_statsforecast_pyfunc_raises_invalid_df_input(
+    arima_ets_fitted_model, model_path
+):
     """Test pyfunc call raises error with invalid dataframe configuration."""
     mlflow_flavors.statsforecast.save_model(
         statsforecast_model=arima_ets_fitted_model, path=model_path

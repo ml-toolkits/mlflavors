@@ -15,3 +15,5 @@ for a description of the supported columns in this configuration ``Pandas DataFr
 .. include:: examples/sktime.rst
 
 .. include:: examples/statsforecast.rst
+
+.. include:: examples/pyod.rst

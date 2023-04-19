@@ -31,8 +31,6 @@ def model_path(tmp_path):
 @pytest.fixture
 def orbit_custom_env(tmp_path):
     """Create a conda environment and returns path to conda environment yml file."""
-    from mlflow.utils.environment import _mlflow_conda_env
-
     conda_env = tmp_path.joinpath("conda_env.yml")
     _mlflow_conda_env(conda_env, additional_pip_deps=["orbit"])
     return conda_env

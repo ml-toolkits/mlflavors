@@ -41,6 +41,10 @@ STATSFORECAST_REQUIREMENTS = [
     "statsforecast",
 ]
 
+PYOD_REQUIREMENTS = [
+    "pyod",
+]
+
 setup(
     name="mlflow_flavors",
     description="""
@@ -65,6 +69,7 @@ setup(
         "orbit": ORBIT_REQUIREMENTS,
         "sktime": SKTIME_REQUIREMENTS,
         "statsforecast": STATSFORECAST_REQUIREMENTS,
+        "pyod": PYOD_REQUIREMENTS,
     },
     version=__version__,
     keywords="machine-learning ai mlflow",
