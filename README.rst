@@ -34,6 +34,9 @@ The following open-source libraris are currently supported:
       * - `PyOD <https://github.com/yzhao062/pyod>`_
         - `MLflow-PyOD Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#pyod>`_
         - Anomaly Detection
+      * - `SDV <https://github.com/sdv-dev/SDV>`_
+        - `MLflow-SDV Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#sdv>`_
+        - Synthetic Data Generation
 
 Installation
 ------------

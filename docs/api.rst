@@ -26,3 +26,9 @@ PyOD
 
 .. automodule:: mlflow_flavors.pyod
     :members:
+
+SDV
+---
+
+.. automodule:: mlflow_flavors.sdv
+    :members:

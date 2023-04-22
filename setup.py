@@ -45,6 +45,10 @@ PYOD_REQUIREMENTS = [
     "pyod",
 ]
 
+SDV_REQUIREMENTS = [
+    "sdv",
+]
+
 setup(
     name="mlflow_flavors",
     description="""
@@ -70,6 +74,7 @@ setup(
         "sktime": SKTIME_REQUIREMENTS,
         "statsforecast": STATSFORECAST_REQUIREMENTS,
         "pyod": PYOD_REQUIREMENTS,
+        "sdv": SDV_REQUIREMENTS,
     },
     version=__version__,
     keywords="machine-learning ai mlflow",

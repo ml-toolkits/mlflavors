@@ -32,7 +32,7 @@ with mlflow.start_run() as run:
 
     print(f"Metrics: \n{json.dumps(metrics, indent=2)}")
 
-    # Log parameters and metrics
+    # Log metrics
     mlflow.log_metrics(metrics)
 
     # Log model using pickle serialization (default).

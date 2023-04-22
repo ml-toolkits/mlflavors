@@ -17,3 +17,5 @@ for a description of the supported columns in this configuration ``Pandas DataFr
 .. include:: examples/statsforecast.rst
 
 .. include:: examples/pyod.rst
+
+.. include:: examples/sdv.rst
