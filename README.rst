@@ -41,17 +41,11 @@ The following open-source libraris are currently supported:
 Installation
 ------------
 
-Installing from PyPI with all flavors:
+Installing from PyPI:
 
 .. code-block:: bash
 
-   $ pip install mlflow-flavors[all]
-
-Installing a particular flavor:
-
-.. code-block:: bash
-
-    $ pip install mlflow-flavors[orbit]
+   $ pip install mlflow-flavors
 
 Quickstart
 ----------

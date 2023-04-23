@@ -7,7 +7,8 @@ mlflow-flavors 0.1.0 is the initial release.
 
 Added:
 
-* Added sktime flavor (#5, @benjaminbluhm)
-* Added orbit flavor (#6, @benjaminbluhm)
-* Added statsforecast flavor (#9, @benjaminbluhm)
-* Added pyod flavor (#10, @benjaminbluhm)
+* Added Sktime flavor (#5, @benjaminbluhm)
+* Added Orbit flavor (#6, @benjaminbluhm)
+* Added StatsForecast flavor (#9, @benjaminbluhm)
+* Added PyOD flavor (#10, @benjaminbluhm)
+* Added SDV flavor (#11, @benjaminbluhm)
