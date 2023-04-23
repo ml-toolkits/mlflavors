@@ -59,7 +59,6 @@ master_doc = "index"
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-# exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
@@ -80,7 +79,6 @@ html_theme_options = {
     "prev_next_buttons_location": "both",
     "style_external_links": True,
     "vcs_pageview_mode": "blob",
-#     "style_nav_header_background": "gainsboro",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
