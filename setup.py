@@ -4,22 +4,24 @@ from setuptools import find_packages, setup
 
 from mlflow_flavors.version import __version__
 
-# packages for local development and unit testing
 PACKAGE_REQUIREMENTS = [
-    "importlib-metadata",
-    "numpy",
+    "datasetsforecast==0.0.8",
     "mlflow",
     "scikit-learn",
+    "orbit-ml",
+    "pmdarima",
+    "sktime",
+    "statsforecast",
+    "pyod",
+    "sdv",
 ]
 
 DEV_REQUIREMENTS = [
-    "datasetsforecast==0.0.8",
     "pre-commit",
     "pytest",
     "pytest-cov",
     "setuptools",
     "tomli",
-    "pmdarima",
 ]
 
 DOC_REQUIREMENTS = [
@@ -27,26 +29,6 @@ DOC_REQUIREMENTS = [
     "numpydoc==1.5.0",
     "sphinx_rtd_theme==1.1.1",
     "sphinx==5.3.0",
-]
-
-ORBIT_REQUIREMENTS = [
-    "orbit-ml",
-]
-
-SKTIME_REQUIREMENTS = [
-    "sktime",
-]
-
-STATSFORECAST_REQUIREMENTS = [
-    "statsforecast",
-]
-
-PYOD_REQUIREMENTS = [
-    "pyod",
-]
-
-SDV_REQUIREMENTS = [
-    "sdv",
 ]
 
 setup(
@@ -70,11 +52,6 @@ setup(
     extras_require={
         "dev": DEV_REQUIREMENTS,
         "docs": DOC_REQUIREMENTS,
-        "orbit": ORBIT_REQUIREMENTS,
-        "sktime": SKTIME_REQUIREMENTS,
-        "statsforecast": STATSFORECAST_REQUIREMENTS,
-        "pyod": PYOD_REQUIREMENTS,
-        "sdv": SDV_REQUIREMENTS,
     },
     version=__version__,
     keywords="machine-learning ai mlflow",

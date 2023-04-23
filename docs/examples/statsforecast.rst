@@ -6,12 +6,6 @@ This example trains a
 AutoARIMA model using the M5 Competition  dataset. This dataset contains the daily sales
 of a product in a Walmart store and some exogenous regressors.
 
-To run this example you need to install the ``datasetsforecast`` library
-
-.. code-block:: bash
-
-    datasetsforecast==0.0.8
-
 Model logging and loading
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
