@@ -5,8 +5,8 @@ from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error
 from statsforecast import StatsForecast
 from statsforecast.models import AutoARIMA
 
-import mlflow_flavors
-from mlflow_flavors.utils.data import load_m5
+import mlflavors
+from mlflavors.utils.data import load_m5
 
 ARTIFACT_PATH = "model"
 DATA_PATH = "./data"
@@ -38,7 +38,7 @@ with mlflow.start_run() as run:
     mlflow.log_metrics(metrics)
 
     # Log model using pickle serialization (default).
-    mlflow_flavors.statsforecast.log_model(
+    mlflavors.statsforecast.log_model(
         statsforecast_model=sf,
         artifact_path=ARTIFACT_PATH,
         serialization_format="pickle",
@@ -46,8 +46,8 @@ with mlflow.start_run() as run:
     model_uri = mlflow.get_artifact_uri(ARTIFACT_PATH)
 
 # Load model in native statsforecast flavor and pyfunc flavor
-loaded_model = mlflow_flavors.statsforecast.load_model(model_uri=model_uri)
-loaded_pyfunc = mlflow_flavors.statsforecast.pyfunc.load_model(model_uri=model_uri)
+loaded_model = mlflavors.statsforecast.load_model(model_uri=model_uri)
+loaded_pyfunc = mlflavors.statsforecast.pyfunc.load_model(model_uri=model_uri)
 
 # Convert test data to 2D numpy array so it can be passed to pyfunc predict using
 # a single-row Pandas DataFrame configuration argument

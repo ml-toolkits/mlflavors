@@ -15,7 +15,7 @@ from sdv.datasets.demo import download_demo
 from sdv.lite import SingleTablePreset
 from sdv.multi_table import HMASynthesizer
 
-import mlflow_flavors.sdv
+import mlflavors.sdv
 
 NUM_ROWS = 10
 SCALE = 2
@@ -87,12 +87,12 @@ def test_single_table_model_save_and_load(
     single_table_model, model_path, serialization_format
 ):
     """Test saving and loading of native sdv single_table_model."""
-    mlflow_flavors.sdv.save_model(
+    mlflavors.sdv.save_model(
         sdv_model=single_table_model,
         path=model_path,
         serialization_format=serialization_format,
     )
-    loaded_model = mlflow_flavors.sdv.load_model(
+    loaded_model = mlflavors.sdv.load_model(
         model_uri=model_path,
     )
 
@@ -107,12 +107,12 @@ def test_multi_table_model_save_and_load(
     multi_table_model, model_path, serialization_format
 ):
     """Test saving and loading of native sdv multi_table_model."""
-    mlflow_flavors.sdv.save_model(
+    mlflavors.sdv.save_model(
         sdv_model=multi_table_model,
         path=model_path,
         serialization_format=serialization_format,
     )
-    loaded_model = mlflow_flavors.sdv.load_model(
+    loaded_model = mlflavors.sdv.load_model(
         model_uri=model_path,
     )
 
@@ -135,12 +135,12 @@ def test_single_table_model_pyfunc_output(
     single_table_model, model_path, serialization_format
 ):
     """Test sdv prediction of loaded pyfunc single_table_model with parameters."""
-    mlflow_flavors.sdv.save_model(
+    mlflavors.sdv.save_model(
         sdv_model=single_table_model,
         path=model_path,
         serialization_format=serialization_format,
     )
-    loaded_pyfunc = mlflow_flavors.sdv.pyfunc.load_model(model_uri=model_path)
+    loaded_pyfunc = mlflavors.sdv.pyfunc.load_model(model_uri=model_path)
 
     predict_conf = pd.DataFrame(
         [
@@ -162,12 +162,12 @@ def test_multi_table_model_pyfunc_output(
     multi_table_model, model_path, serialization_format
 ):
     """Test sdv prediction of loaded pyfunc multi_table_model with parameters."""
-    mlflow_flavors.sdv.save_model(
+    mlflavors.sdv.save_model(
         sdv_model=multi_table_model,
         path=model_path,
         serialization_format=serialization_format,
     )
-    loaded_pyfunc = mlflow_flavors.sdv.pyfunc.load_model(model_uri=model_path)
+    loaded_pyfunc = mlflavors.sdv.pyfunc.load_model(model_uri=model_path)
 
     predict_conf = pd.DataFrame(
         [
@@ -203,7 +203,7 @@ def test_single_table_model_signature_and_examples_saved_correctly(
     # modalities
     prediction = single_table_model.sample(num_rows=NUM_ROWS)
     signature = infer_signature(real_data, prediction) if use_signature else None
-    mlflow_flavors.sdv.save_model(
+    mlflavors.sdv.save_model(
         single_table_model,
         path=model_path,
         signature=signature,
@@ -222,8 +222,8 @@ def test_single_table_model_signature_for_pyfunc_predict(
     model_path_primary = model_path.joinpath("primary")
     model_path_secondary = model_path.joinpath("secondary")
 
-    mlflow_flavors.sdv.save_model(sdv_model=single_table_model, path=model_path_primary)
-    loaded_pyfunc = mlflow_flavors.sdv.pyfunc.load_model(model_uri=model_path_primary)
+    mlflavors.sdv.save_model(sdv_model=single_table_model, path=model_path_primary)
+    loaded_pyfunc = mlflavors.sdv.pyfunc.load_model(model_uri=model_path_primary)
 
     predict_conf = pd.DataFrame(
         [
@@ -236,7 +236,7 @@ def test_single_table_model_signature_for_pyfunc_predict(
 
     prediction = loaded_pyfunc.predict(predict_conf)
     signature = infer_signature(real_data, prediction) if use_signature else None
-    mlflow_flavors.sdv.save_model(
+    mlflavors.sdv.save_model(
         single_table_model,
         path=model_path_secondary,
         signature=signature,
@@ -260,7 +260,7 @@ def test_log_model(
         artifact_path = "model"
         conda_env = tmp_path.joinpath("conda_env.yaml")
         _mlflow_conda_env(conda_env, additional_pip_deps=["sdv"])
-        model_info = mlflow_flavors.sdv.log_model(
+        model_info = mlflavors.sdv.log_model(
             sdv_model=single_table_model,
             artifact_path=artifact_path,
             conda_env=str(conda_env),
@@ -268,7 +268,7 @@ def test_log_model(
         )
         model_uri = f"runs:/{mlflow.active_run().info.run_id}/{artifact_path}"
         assert model_info.model_uri == model_uri
-        reloaded_model = mlflow_flavors.sdv.load_model(
+        reloaded_model = mlflavors.sdv.load_model(
             model_uri=model_uri,
         )
         assert_frame_equal(
@@ -289,7 +289,7 @@ def test_log_model_calls_register_model(single_table_model, tmp_path):
     with mlflow.start_run(), register_model_patch:
         conda_env = tmp_path.joinpath("conda_env.yaml")
         _mlflow_conda_env(conda_env, additional_pip_deps=["sdv"])
-        mlflow_flavors.sdv.log_model(
+        mlflavors.sdv.log_model(
             sdv_model=single_table_model,
             artifact_path=artifact_path,
             conda_env=str(conda_env),
@@ -310,7 +310,7 @@ def test_log_model_no_registered_model_name(single_table_model, tmp_path):
     with mlflow.start_run(), register_model_patch:
         conda_env = tmp_path.joinpath("conda_env.yaml")
         _mlflow_conda_env(conda_env, additional_pip_deps=["sdv"])
-        mlflow_flavors.sdv.log_model(
+        mlflavors.sdv.log_model(
             sdv_model=single_table_model,
             artifact_path=artifact_path,
             conda_env=str(conda_env),
@@ -320,8 +320,8 @@ def test_log_model_no_registered_model_name(single_table_model, tmp_path):
 
 def test_sdv_pyfunc_raises_invalid_df_input(single_table_model, model_path):
     """Test pyfunc call raises error with invalid dataframe configuration."""
-    mlflow_flavors.sdv.save_model(sdv_model=single_table_model, path=model_path)
-    loaded_pyfunc = mlflow_flavors.sdv.pyfunc.load_model(model_uri=model_path)
+    mlflavors.sdv.save_model(sdv_model=single_table_model, path=model_path)
+    loaded_pyfunc = mlflavors.sdv.pyfunc.load_model(model_uri=model_path)
 
     with pytest.raises(MlflowException, match="The provided prediction pd.DataFrame "):
         loaded_pyfunc.predict(

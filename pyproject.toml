@@ -2,7 +2,7 @@
 addopts = """
     -s -p no:warnings
     --ignore docs
-    --cov mlflow_flavors
+    --cov mlflavors
     --cov-report xml
     --cov-report html
 """
@@ -15,7 +15,7 @@ log_level = "INFO"
 [tool.coverage.run]
 branch = true
 source = [
-    "mlflow_flavors"
+    "mlflavors"
 ]
 
 [tool.coverage.report]

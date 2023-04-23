@@ -1,11 +1,10 @@
 """
-The ``mlflow_flavors.sdv`` module provides an API for logging and loading
-sdv models. This module exports sdv models with the following
-flavors:
+The ``mlflavors.orbit`` module provides an API for logging and loading orbit
+models. This module exports orbit models with the following flavors:
 
-sdv (native) format
-    This is the main flavor that can be loaded back into sdv, which relies on
-    pickle internally to serialize a model.
+orbit (native) format
+    This is the main flavor that can be loaded back into orbit, which relies on pickle
+    internally to serialize a model.
 
     Note that pickle serialization requires using the same python environment (version)
     in whatever environment you're going to use this model for inference to ensure that
@@ -14,12 +13,8 @@ sdv (native) format
 :py:mod:`mlflow.pyfunc` format
     Produced for use by generic pyfunc-based deployment tools and batch inference.
 
-    Currently only the ``sample`` method is supported in the ``pyfunc`` flavor.
-    Additional methods (e.g. ``sample_remaining_columns``) could be added in a similar
-    fashion.
-
-    The interface for utilizing an sdv model loaded as a ``pyfunc`` type for
-    generating predictions uses a *single-row* ``Pandas DataFrame``
+    The interface for utilizing an orbit model loaded as a ``pyfunc`` type for
+    generating forecast predictions uses a *single-row* ``Pandas DataFrame``
     configuration argument. The following columns in this configuration
     ``Pandas DataFrame`` are supported:
 
@@ -30,44 +25,30 @@ sdv (native) format
       * - Column
         - Type
         - Description
-      * - modality
-        - str (required)
-        - | Specifies the sdv table modalities. The supported modalities are
-          | ``single_table``, ``multi_table``, and ``sequential``.
+      * - X
+        - numpy ndarray or list (required)
+        - | Exogenous regressor for future time period events.
           | For more information, read the underlying library explanation:
-          | https://docs.sdv.dev/sdv/.
-      * - num_rows
-        - int (required)
-        - | An integer >0, describing the number of rows to sample.
-          | Can only be provided in combination with modality ``single_table``.
-      * - num_sequences
-        - int (required)
-        - | An integer >0, describing the number of sequences to sample.
-          | Can only be provided in combination with modality ``sequential``.
-      * - batch_size
+          | https://orbit-ml.readthedocs.io/en/latest/.
+      * - X_cols
+        - list (required)
+        - | Column names of the exogenous regressor matrix
+          | (Required to construct Pandas DataFrame inside model wrapper class).
+      * - X_dtypes (required)
+        - list (required)
+        - | Data types of the exogenous regressor matrix
+          | (Required to construct Pandas DataFrame inside model wrapper class).
+      * - decompose
+        - bool (optional)
+        - | If True, returns each prediction component separately.
+          | (Default: ``False``)
+      * - store_prediction_array
+        - bool (optional)
+        - | If True, prediction array is stored.
+          | (Default: ``False``)
+      * - seed
         - int (optional)
-        - | An integer >0, describing the number of rows to sample at a time.
-          | Can only be provided in combination with modality ``single_table``.
-          | (Default: ``num_rows``)
-      * - max_tries_per_batch
-        - int (optional)
-        - | An integer >0, describing the number of sampling attempts to make per batch.
-          | Can only be provided in combination with modality ``single_table``.
-          | (Default: ``100``)
-      * - output_file_path
-        - str (optional)
-        - | A string describing a CSV filepath for writing the synthetic data.
-          | Can only be provided in combination with modality ``single_table``.
-          | (Default: ``None``)
-      * - scale
-        - float (optional)
-        - | A float >0.0 that describes how much to scale the data by.
-          | Can only be provided in combination with modality ``multi_table``.
-          | (Default: ``1.0``)
-      * - sequence_length
-        - int (optional)
-        - | An integer >0 describing the length of each sequence.
-          | Can only be provided in combination with modality ``sequential``.
+        - | Seed in prediction is set to be random by default unless provided.
           | (Default: ``None``)
 """  # noqa: E501
 import logging
@@ -75,8 +56,8 @@ import os
 import pickle
 
 import mlflow
+import orbit
 import pandas as pd
-import sdv
 import yaml
 from mlflow import pyfunc
 from mlflow.exceptions import MlflowException
@@ -107,14 +88,9 @@ from mlflow.utils.model_utils import (
 )
 from mlflow.utils.requirements_utils import _get_pinned_requirement
 
-import mlflow_flavors
+import mlflavors
 
-FLAVOR_NAME = "sdv"
-
-SDV_SINGLE_TABLE = "single_table"
-SDV_MULTI_TABLE = "multi_table"
-SDV_SEQUENTIAL = "sequential"
-SUPPORTED_SDV_MODALITIES = [SDV_SINGLE_TABLE, SDV_MULTI_TABLE, SDV_SEQUENTIAL]
+FLAVOR_NAME = "orbit"
 
 SERIALIZATION_FORMAT_PICKLE = "pickle"
 SERIALIZATION_FORMAT_CLOUDPICKLE = "cloudpickle"
@@ -132,7 +108,7 @@ def get_default_pip_requirements(include_cloudpickle=False):
              flavor. Calls to :func:`save_model()` and :func:`log_model()` produce a pip
              environment that, at minimum, contains these requirements.
     """
-    pip_deps = [_get_pinned_requirement("sdv")]
+    pip_deps = [_get_pinned_requirement("orbit")]
     if include_cloudpickle:
         pip_deps += [_get_pinned_requirement("cloudpickle")]
 
@@ -151,7 +127,7 @@ def get_default_conda_env(include_cloudpickle=False):
 
 @format_docstring(LOG_MODEL_PARAM_DOCS.format(package_name=FLAVOR_NAME))
 def save_model(
-    sdv_model,
+    orbit_model,
     path,
     conda_env=None,
     code_paths=None,
@@ -163,13 +139,13 @@ def save_model(
     serialization_format=SERIALIZATION_FORMAT_PICKLE,
 ):
     """
-    Save an sdv model to a path on the local file system. Produces an MLflow Model
+    Save an orbit model to a path on the local file system. Produces an MLflow Model
     containing the following flavors:
 
-        - :py:mod:`mlflow_flavors.sdv`
+        - :py:mod:`mlflavors.orbit`
         - :py:mod:`mlflow.pyfunc`
 
-    :param sdv_model: Fitted sdv model object.
+    :param orbit_model: Fitted orbit model object.
     :param path: Local path where the model is to be saved.
     :param conda_env: {{ conda_env }}
     :param code_paths: A list of local filesystem paths to Python file dependencies (or
@@ -227,11 +203,11 @@ def save_model(
 
     model_data_subpath = "model.pkl"
     model_data_path = os.path.join(path, model_data_subpath)
-    _save_model(sdv_model, model_data_path, serialization_format=serialization_format)
+    _save_model(orbit_model, model_data_path, serialization_format=serialization_format)
 
     pyfunc.add_to_model(
         mlflow_model,
-        loader_module="mlflow_flavors.sdv",
+        loader_module="mlflavors.orbit",
         model_path=model_data_subpath,
         conda_env=_CONDA_ENV_FILE_NAME,
         python_env=_PYTHON_ENV_FILE_NAME,
@@ -241,7 +217,7 @@ def save_model(
     mlflow_model.add_flavor(
         FLAVOR_NAME,
         pickled_model=model_data_subpath,
-        sdv_version=sdv.__version__,
+        orbit_version=orbit.__version__,
         serialization_format=serialization_format,
         code=code_dir_subpath,
     )
@@ -283,7 +259,7 @@ def save_model(
 
 @format_docstring(LOG_MODEL_PARAM_DOCS.format(package_name=FLAVOR_NAME))
 def log_model(
-    sdv_model,
+    orbit_model,
     artifact_path,
     conda_env=None,
     code_paths=None,
@@ -297,13 +273,13 @@ def log_model(
     **kwargs,
 ):
     """
-    Log an sdv model as an MLflow artifact for the current run. Produces an
-    MLflow Model containing the following flavors:
+    Log an orbit model as an MLflow artifact for the current run. Produces an MLflow
+    Model containing the following flavors:
 
-        - :py:mod:`mlflow_flavors.sdv`
+        - :py:mod:`mlflavors.orbit`
         - :py:mod:`mlflow.pyfunc`
 
-    :param sdv_model: Fitted sdv model object.
+    :param orbit_model: Fitted orbit model object.
     :param artifact_path: Run-relative artifact path to save the model instance to.
     :param conda_env: {{ conda_env }}
     :param code_paths: A list of local filesystem paths to Python file dependencies (or
@@ -344,9 +320,9 @@ def log_model(
     """
     return Model.log(
         artifact_path=artifact_path,
-        flavor=mlflow_flavors.sdv,
+        flavor=mlflavors.orbit,
         registered_model_name=registered_model_name,
-        sdv_model=sdv_model,
+        orbit_model=orbit_model,
         conda_env=conda_env,
         code_paths=code_paths,
         signature=signature,
@@ -361,7 +337,7 @@ def log_model(
 
 def load_model(model_uri, dst_path=None):
     """
-    Load an sdv model from a local file or a run.
+    Load an orbit model from a local file or a run.
 
     :param model_uri: The location, in URI format, of the MLflow model, for example:
 
@@ -380,7 +356,7 @@ def load_model(model_uri, dst_path=None):
                      This directory must already exist. If unspecified, a local output
                      path will be created.
 
-    :return: An sdv model.
+    :return: An orbit model.
     """
     local_model_path = _download_artifact_from_uri(
         artifact_uri=model_uri, output_path=dst_path
@@ -389,12 +365,12 @@ def load_model(model_uri, dst_path=None):
         model_path=local_model_path, flavor_name=FLAVOR_NAME
     )
     _add_code_from_conf_to_system_path(local_model_path, flavor_conf)
-    sdv_model_file_path = os.path.join(local_model_path, flavor_conf["pickled_model"])
+    orbit_model_file_path = os.path.join(local_model_path, flavor_conf["pickled_model"])
     serialization_format = flavor_conf.get(
         "serialization_format", SERIALIZATION_FORMAT_PICKLE
     )
     return _load_model(
-        path=sdv_model_file_path, serialization_format=serialization_format
+        path=orbit_model_file_path, serialization_format=serialization_format
     )
 
 
@@ -443,8 +419,7 @@ def _load_pyfunc(path):
     """
     Load PyFunc implementation. Called by ``pyfunc.load_model``.
 
-    :param path: Local filesystem path to the MLflow Model with the sdv
-        flavor.
+    :param path: Local filesystem path to the MLflow Model with the orbit flavor.
     """
     if os.path.isfile(path):
         serialization_format = SERIALIZATION_FORMAT_PICKLE
@@ -453,15 +428,15 @@ def _load_pyfunc(path):
         )
     else:
         try:
-            sdv_flavor_conf = _get_flavor_configuration(
+            orbit_flavor_conf = _get_flavor_configuration(
                 model_path=path, flavor_name=FLAVOR_NAME
             )
-            serialization_format = sdv_flavor_conf.get(
+            serialization_format = orbit_flavor_conf.get(
                 "serialization_format", SERIALIZATION_FORMAT_PICKLE
             )
         except MlflowException:
             _logger.warning(
-                "Could not find sdv flavor configuration during model "
+                "Could not find orbit flavor configuration during model "
                 "loading process. Assuming 'pickle' serialization format."
             )
             serialization_format = SERIALIZATION_FORMAT_PICKLE
@@ -471,16 +446,18 @@ def _load_pyfunc(path):
         )
         path = os.path.join(path, pyfunc_flavor_conf["model_path"])
 
-    return _SDVModelWrapper(
+    return _OrbitModelWrapper(
         _load_model(path, serialization_format=serialization_format)
     )
 
 
-class _SDVModelWrapper:
-    def __init__(self, sdv_model):
-        self.sdv_model = sdv_model
+class _OrbitModelWrapper:
+    def __init__(self, orbit_model):
+        self.orbit_model = orbit_model
 
     def predict(self, dataframe) -> pd.DataFrame:
+        df_schema = dataframe.columns.values.tolist()
+
         if len(dataframe) > 1:
             raise MlflowException(
                 f"The provided prediction pd.DataFrame contains {len(dataframe)} rows. "
@@ -489,39 +466,49 @@ class _SDVModelWrapper:
             )
 
         attrs = dataframe.to_dict(orient="index").get(0)
-        modality = attrs.get("modality")
+        X = attrs.get("X")
+        X_cols = attrs.get("X_cols")
+        X_dtypes = attrs.get("X_dtypes")
+        decompose = attrs.get("decompose", False)
+        store_prediction_array = attrs.get("store_prediction_array", False)
+        seed = attrs.get("seed", None)
 
-        if modality not in SUPPORTED_SDV_MODALITIES:
+        if isinstance(X, type(None)):
             raise MlflowException(
-                "Invalid `modality` value."
-                f"The supported modalities are \
-                {SUPPORTED_SDV_MODALITIES}",
+                f"The provided prediction configuration pd.DataFrame columns ({df_schema}) \
+                do not contain the required column `X` for specifying the regressor \
+                values.",
                 error_code=INVALID_PARAMETER_VALUE,
             )
 
-        if modality == SDV_SINGLE_TABLE:
-            num_rows = attrs.get("num_rows")
-            batch_size = attrs.get("batch_size", num_rows)
-            max_tries_per_batch = attrs.get("max_tries_per_batch", 100)
-            output_file_path = attrs.get("output_file_path", None)
-
-            predictions = self.sdv_model.sample(
-                num_rows=num_rows,
-                batch_size=batch_size,
-                max_tries_per_batch=max_tries_per_batch,
-                output_file_path=output_file_path,
+        if isinstance(X_cols, type(None)):
+            raise MlflowException(
+                f"The provided prediction configuration pd.DataFrame columns ({df_schema}) \
+                do not contain the required column `X_cols` for specifying the \
+                regressor columns.",
+                error_code=INVALID_PARAMETER_VALUE,
             )
 
-        if modality == SDV_MULTI_TABLE:
-            scale = attrs.get("scale", 1.0)
-            predictions = [self.sdv_model.sample(scale=scale)]
-
-        if modality == SDV_SEQUENTIAL:
-            num_sequences = attrs.get("num_sequences")
-            sequence_length = attrs.get("sequence_length", None)
-            predictions = self.sdv_model.sample(
-                num_sequences=num_sequences,
-                sequence_length=sequence_length,
+        if isinstance(X_dtypes, type(None)):
+            raise MlflowException(
+                f"The provided prediction configuration pd.DataFrame columns ({df_schema}) \
+                do not contain the required column `X_dtypes` for specifying the \
+                regressor column types.",
+                error_code=INVALID_PARAMETER_VALUE,
             )
+
+        # Create Pandas DataFrame as required by Orbit predict method
+        df = pd.DataFrame(data=X, columns=X_cols)
+
+        # Cast columns to correct type
+        for col, dtype in zip(X_cols, X_dtypes):
+            df[col] = df[col].astype(dtype)
+
+        predictions = self.orbit_model.predict(
+            df,
+            decompose=decompose,
+            store_prediction_array=store_prediction_array,
+            seed=seed,
+        )
 
         return predictions

@@ -16,7 +16,7 @@ from numpy.testing import assert_array_equal
 from pyod.models.knn import KNN
 from pyod.utils.data import generate_data
 
-import mlflow_flavors.pyod
+import mlflavors.pyod
 
 SEASON_LENGTH = 12
 LEVEL = [90, 95]
@@ -66,12 +66,12 @@ def knn_model(data):
 def test_knn_model_save_and_load(knn_model, model_path, serialization_format, data):
     """Test saving and loading of native pyod model."""
     _, X_test, _, _ = data
-    mlflow_flavors.pyod.save_model(
+    mlflavors.pyod.save_model(
         pyod_model=knn_model,
         path=model_path,
         serialization_format=serialization_format,
     )
-    loaded_model = mlflow_flavors.pyod.load_model(
+    loaded_model = mlflavors.pyod.load_model(
         model_uri=model_path,
     )
 
@@ -85,12 +85,12 @@ def test_knn_model_save_and_load(knn_model, model_path, serialization_format, da
 def test_knn_model_pyfunc_output(knn_model, model_path, serialization_format, data):
     """Test pyod prediction of loaded pyfunc model with parameters."""
     _, X_test, _, _ = data
-    mlflow_flavors.pyod.save_model(
+    mlflavors.pyod.save_model(
         pyod_model=knn_model,
         path=model_path,
         serialization_format=serialization_format,
     )
-    loaded_pyfunc = mlflow_flavors.pyod.pyfunc.load_model(model_uri=model_path)
+    loaded_pyfunc = mlflavors.pyod.pyfunc.load_model(model_uri=model_path)
 
     predict_conf = pd.DataFrame(
         [
@@ -169,7 +169,7 @@ def test_signature_and_examples_saved_correctly(
     prediction = knn_model.predict(X_test)
     signature = infer_signature(X_test, prediction) if use_signature else None
     example = X_test[0:5] if use_example else None
-    mlflow_flavors.pyod.save_model(
+    mlflavors.pyod.save_model(
         knn_model,
         path=model_path,
         signature=signature,
@@ -192,8 +192,8 @@ def test_signature_for_pyfunc_predict(knn_model, model_path, data, use_signature
     model_path_primary = model_path.joinpath("primary")
     model_path_secondary = model_path.joinpath("secondary")
 
-    mlflow_flavors.pyod.save_model(pyod_model=knn_model, path=model_path_primary)
-    loaded_pyfunc = mlflow_flavors.pyod.pyfunc.load_model(model_uri=model_path_primary)
+    mlflavors.pyod.save_model(pyod_model=knn_model, path=model_path_primary)
+    loaded_pyfunc = mlflavors.pyod.pyfunc.load_model(model_uri=model_path_primary)
 
     predict_conf = pd.DataFrame(
         [
@@ -206,7 +206,7 @@ def test_signature_for_pyfunc_predict(knn_model, model_path, data, use_signature
 
     forecast = loaded_pyfunc.predict(predict_conf)
     signature = infer_signature(X_test, forecast[0]) if use_signature else None
-    mlflow_flavors.pyod.save_model(
+    mlflavors.pyod.save_model(
         knn_model,
         path=model_path_secondary,
         signature=signature,
@@ -233,7 +233,7 @@ def test_log_model(
         artifact_path = "model"
         conda_env = tmp_path.joinpath("conda_env.yaml")
         _mlflow_conda_env(conda_env, additional_pip_deps=["pyod"])
-        model_info = mlflow_flavors.pyod.log_model(
+        model_info = mlflavors.pyod.log_model(
             pyod_model=knn_model,
             artifact_path=artifact_path,
             conda_env=str(conda_env),
@@ -241,7 +241,7 @@ def test_log_model(
         )
         model_uri = f"runs:/{mlflow.active_run().info.run_id}/{artifact_path}"
         assert model_info.model_uri == model_uri
-        reloaded_model = mlflow_flavors.pyod.load_model(
+        reloaded_model = mlflavors.pyod.load_model(
             model_uri=model_uri,
         )
         np.testing.assert_array_equal(
@@ -262,7 +262,7 @@ def test_log_model_calls_register_model(knn_model, tmp_path):
     with mlflow.start_run(), register_model_patch:
         conda_env = tmp_path.joinpath("conda_env.yaml")
         _mlflow_conda_env(conda_env, additional_pip_deps=["pyod"])
-        mlflow_flavors.pyod.log_model(
+        mlflavors.pyod.log_model(
             pyod_model=knn_model,
             artifact_path=artifact_path,
             conda_env=str(conda_env),
@@ -283,7 +283,7 @@ def test_log_model_no_registered_model_name(knn_model, tmp_path):
     with mlflow.start_run(), register_model_patch:
         conda_env = tmp_path.joinpath("conda_env.yaml")
         _mlflow_conda_env(conda_env, additional_pip_deps=["pyod"])
-        mlflow_flavors.pyod.log_model(
+        mlflavors.pyod.log_model(
             pyod_model=knn_model,
             artifact_path=artifact_path,
             conda_env=str(conda_env),
@@ -294,8 +294,8 @@ def test_log_model_no_registered_model_name(knn_model, tmp_path):
 def test_pyod_pyfunc_raises_invalid_df_input(knn_model, model_path, data):
     """Test pyfunc call raises error with invalid dataframe configuration."""
     _, X_test, _, _ = data
-    mlflow_flavors.pyod.save_model(pyod_model=knn_model, path=model_path)
-    loaded_pyfunc = mlflow_flavors.pyod.pyfunc.load_model(model_uri=model_path)
+    mlflavors.pyod.save_model(pyod_model=knn_model, path=model_path)
+    loaded_pyfunc = mlflavors.pyod.pyfunc.load_model(model_uri=model_path)
 
     with pytest.raises(MlflowException, match="The provided prediction pd.DataFrame "):
         loaded_pyfunc.predict(

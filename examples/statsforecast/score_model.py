@@ -1,7 +1,7 @@
 import pandas as pd
 import requests
 
-from mlflow_flavors.utils.data import load_m5
+from mlflavors.utils.data import load_m5
 
 DATA_PATH = "./data"
 HORIZON = 28

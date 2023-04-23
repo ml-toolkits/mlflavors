@@ -15,7 +15,7 @@ from orbit.models import DLT
 from orbit.utils.dataset import load_iclaims
 from pandas.testing import assert_frame_equal
 
-import mlflow_flavors.orbit
+import mlflavors.orbit
 
 SEED = 2023
 DECOMPOSE = True
@@ -65,12 +65,12 @@ def test_dlt_model_save_and_load(
 ):
     """Test saving and loading of native orbit dlt model."""
     _, test_df = data_iclaims
-    mlflow_flavors.orbit.save_model(
+    mlflavors.orbit.save_model(
         orbit_model=dlt_model,
         path=model_path,
         serialization_format=serialization_format,
     )
-    loaded_model = mlflow_flavors.orbit.load_model(
+    loaded_model = mlflavors.orbit.load_model(
         model_uri=model_path,
     )
 
@@ -85,12 +85,12 @@ def test_dlt_model_pyfunc_output(
 ):
     """Test dlt prediction of loaded pyfunc model with parameters."""
     _, test_df = data_iclaims
-    mlflow_flavors.orbit.save_model(
+    mlflavors.orbit.save_model(
         orbit_model=dlt_model,
         path=model_path,
         serialization_format=serialization_format,
     )
-    loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model(model_uri=model_path)
+    loaded_pyfunc = mlflavors.orbit.pyfunc.load_model(model_uri=model_path)
 
     X_test_array = test_df.to_numpy()
     predict_conf = pd.DataFrame(
@@ -130,7 +130,7 @@ def test_signature_and_examples_saved_correctly(
     # Note: Example inference fails due to incorrect recreation of numpy timestamp
     prediction = dlt_model.predict(test_df)
     signature = infer_signature(test_df, prediction) if use_signature else None
-    mlflow_flavors.orbit.save_model(
+    mlflavors.orbit.save_model(
         dlt_model,
         path=model_path,
         signature=signature,
@@ -149,8 +149,8 @@ def test_signature_for_pyfunc_predict(
     model_path_primary = model_path.joinpath("primary")
     model_path_secondary = model_path.joinpath("secondary")
 
-    mlflow_flavors.orbit.save_model(orbit_model=dlt_model, path=model_path_primary)
-    loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model(model_uri=model_path_primary)
+    mlflavors.orbit.save_model(orbit_model=dlt_model, path=model_path_primary)
+    loaded_pyfunc = mlflavors.orbit.pyfunc.load_model(model_uri=model_path_primary)
 
     X_test_array = test_df.to_numpy()
     predict_conf = pd.DataFrame(
@@ -168,7 +168,7 @@ def test_signature_for_pyfunc_predict(
 
     forecast = loaded_pyfunc.predict(predict_conf)
     signature = infer_signature(test_df, forecast) if use_signature else None
-    mlflow_flavors.orbit.save_model(
+    mlflavors.orbit.save_model(
         dlt_model,
         path=model_path_secondary,
         signature=signature,
@@ -191,7 +191,7 @@ def test_log_model(
         artifact_path = "model"
         conda_env = tmp_path.joinpath("conda_env.yaml")
         _mlflow_conda_env(conda_env, additional_pip_deps=["orbit"])
-        model_info = mlflow_flavors.orbit.log_model(
+        model_info = mlflavors.orbit.log_model(
             orbit_model=dlt_model,
             artifact_path=artifact_path,
             conda_env=str(conda_env),
@@ -199,7 +199,7 @@ def test_log_model(
         )
         model_uri = f"runs:/{mlflow.active_run().info.run_id}/{artifact_path}"
         assert model_info.model_uri == model_uri
-        reloaded_model = mlflow_flavors.orbit.load_model(
+        reloaded_model = mlflavors.orbit.load_model(
             model_uri=model_uri,
         )
         np.testing.assert_array_equal(
@@ -220,7 +220,7 @@ def test_log_model_calls_register_model(dlt_model, tmp_path):
     with mlflow.start_run(), register_model_patch:
         conda_env = tmp_path.joinpath("conda_env.yaml")
         _mlflow_conda_env(conda_env, additional_pip_deps=["orbit"])
-        mlflow_flavors.orbit.log_model(
+        mlflavors.orbit.log_model(
             orbit_model=dlt_model,
             artifact_path=artifact_path,
             conda_env=str(conda_env),
@@ -241,7 +241,7 @@ def test_log_model_no_registered_model_name(dlt_model, tmp_path):
     with mlflow.start_run(), register_model_patch:
         conda_env = tmp_path.joinpath("conda_env.yaml")
         _mlflow_conda_env(conda_env, additional_pip_deps=["orbit"])
-        mlflow_flavors.orbit.log_model(
+        mlflavors.orbit.log_model(
             orbit_model=dlt_model,
             artifact_path=artifact_path,
             conda_env=str(conda_env),
@@ -251,8 +251,8 @@ def test_log_model_no_registered_model_name(dlt_model, tmp_path):
 
 def test_orbit_pyfunc_raises_invalid_df_input(dlt_model, model_path):
     """Test pyfunc call raises error with invalid dataframe configuration."""
-    mlflow_flavors.orbit.save_model(orbit_model=dlt_model, path=model_path)
-    loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model(model_uri=model_path)
+    mlflavors.orbit.save_model(orbit_model=dlt_model, path=model_path)
+    loaded_pyfunc = mlflavors.orbit.pyfunc.load_model(model_uri=model_path)
 
     with pytest.raises(MlflowException, match="The provided prediction pd.DataFrame "):
         loaded_pyfunc.predict(pd.DataFrame([{"decompose": DECOMPOSE}, {"seed": SEED}]))
@@ -264,6 +264,6 @@ def test_orbit_pyfunc_raises_invalid_df_input(dlt_model, model_path):
 def test_orbit_save_model_raises_invalid_serialization_format(dlt_model, model_path):
     """Test save_model call raises error with invalid serialization format."""
     with pytest.raises(MlflowException, match="Unrecognized serialization format: "):
-        mlflow_flavors.orbit.save_model(
+        mlflavors.orbit.save_model(
             orbit_model=dlt_model, path=model_path, serialization_format="json"
         )

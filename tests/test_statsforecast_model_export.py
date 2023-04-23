@@ -17,8 +17,8 @@ from statsforecast import StatsForecast
 from statsforecast.models import AutoARIMA, AutoETS, Naive
 from statsforecast.utils import AirPassengersDF
 
-import mlflow_flavors.statsforecast
-from mlflow_flavors.utils.data import load_m5
+import mlflavors.statsforecast
+from mlflavors.utils.data import load_m5
 
 SEASON_LENGTH = 12
 LEVEL = [90, 95]
@@ -111,12 +111,12 @@ def test_arima_ets_model_save_and_load(
 ):
     """Test saving and loading of native statsforecast model."""
     _, test_df = data_air_passengers
-    mlflow_flavors.statsforecast.save_model(
+    mlflavors.statsforecast.save_model(
         statsforecast_model=arima_ets_model,
         path=model_path,
         serialization_format=serialization_format,
     )
-    loaded_model = mlflow_flavors.statsforecast.load_model(
+    loaded_model = mlflavors.statsforecast.load_model(
         model_uri=model_path,
     )
 
@@ -133,12 +133,12 @@ def test_arima_ets_fitted_model_save_and_load(
 ):
     """Test saving and loading of native statsforecast model."""
     _, test_df = data_air_passengers
-    mlflow_flavors.statsforecast.save_model(
+    mlflavors.statsforecast.save_model(
         statsforecast_model=arima_ets_fitted_model,
         path=model_path,
         serialization_format=serialization_format,
     )
-    loaded_model = mlflow_flavors.statsforecast.load_model(
+    loaded_model = mlflavors.statsforecast.load_model(
         model_uri=model_path,
     )
 
@@ -155,12 +155,12 @@ def test_arima_with_exogenous_fitted_model_save_and_load(
 ):
     """Test saving and loading of native statsforecast model."""
     _, test_df = data_m5
-    mlflow_flavors.statsforecast.save_model(
+    mlflavors.statsforecast.save_model(
         statsforecast_model=arima_with_exogenous_fitted_model,
         path=model_path,
         serialization_format=serialization_format,
     )
-    loaded_model = mlflow_flavors.statsforecast.load_model(
+    loaded_model = mlflavors.statsforecast.load_model(
         model_uri=model_path,
     )
 
@@ -178,12 +178,12 @@ def test_arima_ets_fitted_model_pyfunc_output(
 ):
     """Test statsforecast prediction of loaded pyfunc model with parameters."""
     _, test_df = data_air_passengers
-    mlflow_flavors.statsforecast.save_model(
+    mlflavors.statsforecast.save_model(
         statsforecast_model=arima_ets_fitted_model,
         path=model_path,
         serialization_format=serialization_format,
     )
-    loaded_pyfunc = mlflow_flavors.statsforecast.pyfunc.load_model(model_uri=model_path)
+    loaded_pyfunc = mlflavors.statsforecast.pyfunc.load_model(model_uri=model_path)
 
     horizon = len(test_df)
 
@@ -208,12 +208,12 @@ def test_arima_with_exogenous_fitted_model_pyfunc_output(
 ):
     """Test statsforecast prediction of loaded pyfunc model with parameters."""
     _, test_df = data_m5
-    mlflow_flavors.statsforecast.save_model(
+    mlflavors.statsforecast.save_model(
         statsforecast_model=arima_with_exogenous_fitted_model,
         path=model_path,
         serialization_format=serialization_format,
     )
-    loaded_pyfunc = mlflow_flavors.statsforecast.pyfunc.load_model(model_uri=model_path)
+    loaded_pyfunc = mlflavors.statsforecast.pyfunc.load_model(model_uri=model_path)
 
     X_test_array = test_df.to_numpy()
     horizon = len(test_df)
@@ -252,7 +252,7 @@ def test_signature_and_examples_saved_correctly(
     horizon = len(test_df)
     prediction = arima_ets_fitted_model.predict(h=horizon, level=LEVEL)
     signature = infer_signature(test_df, prediction) if use_signature else None
-    mlflow_flavors.statsforecast.save_model(
+    mlflavors.statsforecast.save_model(
         arima_ets_fitted_model,
         path=model_path,
         signature=signature,
@@ -272,10 +272,10 @@ def test_signature_for_pyfunc_predict(
     model_path_primary = model_path.joinpath("primary")
     model_path_secondary = model_path.joinpath("secondary")
 
-    mlflow_flavors.statsforecast.save_model(
+    mlflavors.statsforecast.save_model(
         statsforecast_model=arima_ets_fitted_model, path=model_path_primary
     )
-    loaded_pyfunc = mlflow_flavors.statsforecast.pyfunc.load_model(
+    loaded_pyfunc = mlflavors.statsforecast.pyfunc.load_model(
         model_uri=model_path_primary
     )
 
@@ -290,7 +290,7 @@ def test_signature_for_pyfunc_predict(
 
     forecast = loaded_pyfunc.predict(predict_conf)
     signature = infer_signature(test_df, forecast) if use_signature else None
-    mlflow_flavors.statsforecast.save_model(
+    mlflavors.statsforecast.save_model(
         arima_ets_fitted_model,
         path=model_path_secondary,
         signature=signature,
@@ -318,7 +318,7 @@ def test_log_model(
         artifact_path = "model"
         conda_env = tmp_path.joinpath("conda_env.yaml")
         _mlflow_conda_env(conda_env, additional_pip_deps=["statsforecast"])
-        model_info = mlflow_flavors.statsforecast.log_model(
+        model_info = mlflavors.statsforecast.log_model(
             statsforecast_model=arima_ets_fitted_model,
             artifact_path=artifact_path,
             conda_env=str(conda_env),
@@ -326,7 +326,7 @@ def test_log_model(
         )
         model_uri = f"runs:/{mlflow.active_run().info.run_id}/{artifact_path}"
         assert model_info.model_uri == model_uri
-        reloaded_model = mlflow_flavors.statsforecast.load_model(
+        reloaded_model = mlflavors.statsforecast.load_model(
             model_uri=model_uri,
         )
         np.testing.assert_array_equal(
@@ -347,7 +347,7 @@ def test_log_model_calls_register_model(arima_ets_fitted_model, tmp_path):
     with mlflow.start_run(), register_model_patch:
         conda_env = tmp_path.joinpath("conda_env.yaml")
         _mlflow_conda_env(conda_env, additional_pip_deps=["statsforecast"])
-        mlflow_flavors.statsforecast.log_model(
+        mlflavors.statsforecast.log_model(
             statsforecast_model=arima_ets_fitted_model,
             artifact_path=artifact_path,
             conda_env=str(conda_env),
@@ -368,7 +368,7 @@ def test_log_model_no_registered_model_name(arima_ets_fitted_model, tmp_path):
     with mlflow.start_run(), register_model_patch:
         conda_env = tmp_path.joinpath("conda_env.yaml")
         _mlflow_conda_env(conda_env, additional_pip_deps=["statsforecast"])
-        mlflow_flavors.statsforecast.log_model(
+        mlflavors.statsforecast.log_model(
             statsforecast_model=arima_ets_fitted_model,
             artifact_path=artifact_path,
             conda_env=str(conda_env),
@@ -380,10 +380,10 @@ def test_statsforecast_pyfunc_raises_invalid_df_input(
     arima_ets_fitted_model, model_path
 ):
     """Test pyfunc call raises error with invalid dataframe configuration."""
-    mlflow_flavors.statsforecast.save_model(
+    mlflavors.statsforecast.save_model(
         statsforecast_model=arima_ets_fitted_model, path=model_path
     )
-    loaded_pyfunc = mlflow_flavors.statsforecast.pyfunc.load_model(model_uri=model_path)
+    loaded_pyfunc = mlflavors.statsforecast.pyfunc.load_model(model_uri=model_path)
 
     with pytest.raises(MlflowException, match="The provided prediction pd.DataFrame "):
         loaded_pyfunc.predict(pd.DataFrame([{"h": 1}, {"level": LEVEL}]))
@@ -397,7 +397,7 @@ def test_statsforecast_save_model_raises_invalid_serialization_format(
 ):
     """Test save_model call raises error with invalid serialization format."""
     with pytest.raises(MlflowException, match="Unrecognized serialization format: "):
-        mlflow_flavors.statsforecast.save_model(
+        mlflavors.statsforecast.save_model(
             statsforecast_model=arima_ets_fitted_model,
             path=model_path,
             serialization_format="json",

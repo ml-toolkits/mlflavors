@@ -20,7 +20,7 @@ from sktime.forecasting.arima import AutoARIMA
 from sktime.forecasting.model_selection import temporal_train_test_split
 from sktime.forecasting.naive import NaiveForecaster
 
-import mlflow_flavors.sktime
+import mlflavors.sktime
 
 FH = [1, 2, 3]
 COVERAGE = [0.1, 0.5, 0.9]
@@ -77,12 +77,12 @@ def test_auto_arima_model_save_and_load(
     auto_arima_model, model_path, serialization_format
 ):
     """Test saving and loading of native sktime auto_arima_model."""
-    mlflow_flavors.sktime.save_model(
+    mlflavors.sktime.save_model(
         sktime_model=auto_arima_model,
         path=model_path,
         serialization_format=serialization_format,
     )
-    loaded_model = mlflow_flavors.sktime.load_model(
+    loaded_model = mlflavors.sktime.load_model(
         model_uri=model_path,
     )
 
@@ -96,12 +96,12 @@ def test_auto_arima_model_pyfunc_output(
     auto_arima_model, model_path, serialization_format
 ):
     """Test auto arima prediction of loaded pyfunc model."""
-    mlflow_flavors.sktime.save_model(
+    mlflavors.sktime.save_model(
         sktime_model=auto_arima_model,
         path=model_path,
         serialization_format=serialization_format,
     )
-    loaded_pyfunc = mlflow_flavors.sktime.pyfunc.load_model(model_uri=model_path)
+    loaded_pyfunc = mlflavors.sktime.pyfunc.load_model(model_uri=model_path)
 
     model_predict = auto_arima_model.predict(fh=FH)
     predict_conf = pd.DataFrame([{"fh": FH, "predict_method": "predict"}])
@@ -152,10 +152,10 @@ def test_naive_forecaster_model_with_regressor_pyfunc_output(
     """Test naive forecaster prediction of loaded pyfunc model."""
     _, _, _, X_test = data_longley
 
-    mlflow_flavors.sktime.save_model(
+    mlflavors.sktime.save_model(
         sktime_model=naive_forecaster_model_with_regressor, path=model_path
     )
-    loaded_pyfunc = mlflow_flavors.sktime.pyfunc.load_model(model_uri=model_path)
+    loaded_pyfunc = mlflavors.sktime.pyfunc.load_model(model_uri=model_path)
 
     X_test_array = convert(X_test, "pd.DataFrame", "np.ndarray")
 
@@ -229,7 +229,7 @@ def test_signature_and_examples_saved_correctly(
     prediction = auto_arima_model.predict(fh=FH)
     signature = infer_signature(data_airline, prediction) if use_signature else None
     example = pd.DataFrame(data_airline[0:5].copy(deep=False)) if use_example else None
-    mlflow_flavors.sktime.save_model(
+    mlflavors.sktime.save_model(
         auto_arima_model, path=model_path, signature=signature, input_example=example
     )
     mlflow_model = Model.load(model_path)
@@ -248,7 +248,7 @@ def test_predict_var_signature_saved_correctly(
     """Test saving of mlflow signature for native sktime predict_var method."""
     prediction = auto_arima_model.predict_var(fh=FH)
     signature = infer_signature(data_airline, prediction) if use_signature else None
-    mlflow_flavors.sktime.save_model(
+    mlflavors.sktime.save_model(
         auto_arima_model, path=model_path, signature=signature
     )
     mlflow_model = Model.load(model_path)
@@ -263,10 +263,10 @@ def test_signature_and_example_for_pyfunc_predict_inteval(
     """Test saving of mlflow signature and example for pyfunc predict."""
     model_path_primary = model_path.joinpath("primary")
     model_path_secondary = model_path.joinpath("secondary")
-    mlflow_flavors.sktime.save_model(
+    mlflavors.sktime.save_model(
         sktime_model=auto_arima_model, path=model_path_primary
     )
-    loaded_pyfunc = mlflow_flavors.sktime.pyfunc.load_model(
+    loaded_pyfunc = mlflavors.sktime.pyfunc.load_model(
         model_uri=model_path_primary
     )
     predict_conf = pd.DataFrame(
@@ -281,7 +281,7 @@ def test_signature_and_example_for_pyfunc_predict_inteval(
     forecast = loaded_pyfunc.predict(predict_conf)
     signature = infer_signature(data_airline, forecast) if use_signature else None
     example = pd.DataFrame(data_airline[0:5].copy(deep=False)) if use_example else None
-    mlflow_flavors.sktime.save_model(
+    mlflavors.sktime.save_model(
         auto_arima_model,
         path=model_path_secondary,
         signature=signature,
@@ -303,10 +303,10 @@ def test_signature_for_pyfunc_predict_quantiles(
     """Test saving of mlflow signature for pyfunc sktime predict_quantiles method."""
     model_path_primary = model_path.joinpath("primary")
     model_path_secondary = model_path.joinpath("secondary")
-    mlflow_flavors.sktime.save_model(
+    mlflavors.sktime.save_model(
         sktime_model=auto_arima_model, path=model_path_primary
     )
-    loaded_pyfunc = mlflow_flavors.sktime.pyfunc.load_model(
+    loaded_pyfunc = mlflavors.sktime.pyfunc.load_model(
         model_uri=model_path_primary
     )
     predict_conf = pd.DataFrame(
@@ -320,7 +320,7 @@ def test_signature_for_pyfunc_predict_quantiles(
     )
     forecast = loaded_pyfunc.predict(predict_conf)
     signature = infer_signature(data_airline, forecast) if use_signature else None
-    mlflow_flavors.sktime.save_model(
+    mlflavors.sktime.save_model(
         auto_arima_model, path=model_path_secondary, signature=signature
     )
     mlflow_model = Model.load(model_path_secondary)
@@ -337,7 +337,7 @@ def test_log_model(auto_arima_model, tmp_path, should_start_run, serialization_f
         artifact_path = "sktime"
         conda_env = tmp_path.joinpath("conda_env.yaml")
         _mlflow_conda_env(conda_env, additional_pip_deps=["sktime"])
-        model_info = mlflow_flavors.sktime.log_model(
+        model_info = mlflavors.sktime.log_model(
             sktime_model=auto_arima_model,
             artifact_path=artifact_path,
             conda_env=str(conda_env),
@@ -345,7 +345,7 @@ def test_log_model(auto_arima_model, tmp_path, should_start_run, serialization_f
         )
         model_uri = f"runs:/{mlflow.active_run().info.run_id}/{artifact_path}"
         assert model_info.model_uri == model_uri
-        reloaded_model = mlflow_flavors.sktime.load_model(
+        reloaded_model = mlflavors.sktime.load_model(
             model_uri=model_uri,
         )
         np.testing.assert_array_equal(
@@ -365,7 +365,7 @@ def test_log_model_calls_register_model(auto_arima_model, tmp_path):
     with mlflow.start_run(), register_model_patch:
         conda_env = tmp_path.joinpath("conda_env.yaml")
         _mlflow_conda_env(conda_env, additional_pip_deps=["sktime"])
-        mlflow_flavors.sktime.log_model(
+        mlflavors.sktime.log_model(
             sktime_model=auto_arima_model,
             artifact_path=artifact_path,
             conda_env=str(conda_env),
@@ -386,7 +386,7 @@ def test_log_model_no_registered_model_name(auto_arima_model, tmp_path):
     with mlflow.start_run(), register_model_patch:
         conda_env = tmp_path.joinpath("conda_env.yaml")
         _mlflow_conda_env(conda_env, additional_pip_deps=["sktime"])
-        mlflow_flavors.sktime.log_model(
+        mlflavors.sktime.log_model(
             sktime_model=auto_arima_model,
             artifact_path=artifact_path,
             conda_env=str(conda_env),
@@ -396,8 +396,8 @@ def test_log_model_no_registered_model_name(auto_arima_model, tmp_path):
 
 def test_sktime_pyfunc_raises_invalid_df_input(auto_arima_model, model_path):
     """Test pyfunc call raises error with invalid dataframe configuration."""
-    mlflow_flavors.sktime.save_model(sktime_model=auto_arima_model, path=model_path)
-    loaded_pyfunc = mlflow_flavors.sktime.pyfunc.load_model(model_uri=model_path)
+    mlflavors.sktime.save_model(sktime_model=auto_arima_model, path=model_path)
+    loaded_pyfunc = mlflavors.sktime.pyfunc.load_model(model_uri=model_path)
 
     with pytest.raises(MlflowException, match="The provided prediction pd.DataFrame "):
         loaded_pyfunc.predict(pd.DataFrame([{"predict_method": "predict"}, {"fh": FH}]))
@@ -414,6 +414,6 @@ def test_sktime_save_model_raises_invalid_serialization_format(
 ):
     """Test save_model call raises error with invalid serialization format."""
     with pytest.raises(MlflowException, match="Unrecognized serialization format: "):
-        mlflow_flavors.sktime.save_model(
+        mlflavors.sktime.save_model(
             sktime_model=auto_arima_model, path=model_path, serialization_format="json"
         )

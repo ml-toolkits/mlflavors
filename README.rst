@@ -1,6 +1,6 @@
 
-mlflow-flavors
-==============
+MLflavors
+=========
 
 This package adds MLflow support for some popular machine learning frameworks currently
 not available as MLflow built-in flavors. The MLflow interface for the supported
@@ -23,19 +23,19 @@ The following open-source libraris are currently supported:
         - Quickstart
         - Category
       * - `Orbit <https://github.com/uber/orbit>`_
-        - `MLflow-Orbit Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#orbit>`_
+        - `MLflow-Orbit Example <https://mlflavors.readthedocs.io/en/latest/examples.html#orbit>`_
         - Time Series Forecasting
       * - `Sktime <https://github.com/sktime/sktime>`_
-        - `MLflow-Sktime Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#sktime>`_
+        - `MLflow-Sktime Example <https://mlflavors.readthedocs.io/en/latest/examples.html#sktime>`_
         - Time Series Forecasting
       * - `StatsForecast <https://github.com/Nixtla/statsforecast>`_
-        - `MLflow-StatsForecast Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#statsforecast>`_
+        - `MLflow-StatsForecast Example <https://mlflavors.readthedocs.io/en/latest/examples.html#statsforecast>`_
         - Time Series Forecasting
       * - `PyOD <https://github.com/yzhao062/pyod>`_
-        - `MLflow-PyOD Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#pyod>`_
+        - `MLflow-PyOD Example <https://mlflavors.readthedocs.io/en/latest/examples.html#pyod>`_
         - Anomaly Detection
       * - `SDV <https://github.com/sdv-dev/SDV>`_
-        - `MLflow-SDV Example <https://mlflow-flavors.readthedocs.io/en/latest/examples.html#sdv>`_
+        - `MLflow-SDV Example <https://mlflavors.readthedocs.io/en/latest/examples.html#sdv>`_
         - Synthetic Data Generation
 
 Installation
@@ -45,7 +45,7 @@ Installing from PyPI:
 
 .. code-block:: bash
 
-   $ pip install mlflow-flavors
+   $ pip install mlflavors
 
 Quickstart
 ----------
@@ -113,8 +113,8 @@ Make a prediction loading the model from MLflow in ``pyfunc`` format:
 Documentation
 -------------
 
-Documentation, examples, and API reference for mlflow-flavors can be found
-`here <https://mlflow-flavors.readthedocs.io/en/latest/index.html>`_.
+Documentation, examples, and API reference for mlflavors can be found
+`here <https://mlflavors.readthedocs.io/en/latest/index.html>`_.
 
 Contributing
 ------------
@@ -126,7 +126,7 @@ Versioning
 ----------
 
 We document versions and changes in our
-`changelog <https://github.com/blue-pen-labs/mlflow-flavors/tree/main/CHANGELOG.rst>`_ .
+`changelog <https://github.com/blue-pen-labs/mlflavors/tree/main/CHANGELOG.rst>`_ .
 
 Development
 -----------
@@ -135,8 +135,8 @@ To set up your local development environment, create a virtual environment, such
 
 .. code-block:: bash
 
-    $ conda create -n mlflow-flavors-dev python=3.9
-    $ source activate mlflow-flavors-dev
+    $ conda create -n mlflavors-dev python=3.9
+    $ source activate mlflavors-dev
 
 Install project locally:
 

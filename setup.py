@@ -2,13 +2,13 @@
 
 from setuptools import find_packages, setup
 
-from mlflow_flavors.version import __version__
+from mlflavors.version import __version__
 
 PACKAGE_REQUIREMENTS = [
     "datasetsforecast==0.0.8",
     "mlflow",
     "scikit-learn",
-    "orbit-ml",
+    # "orbit-ml",
     "pmdarima",
     "sktime",
     "statsforecast",
@@ -32,19 +32,19 @@ DOC_REQUIREMENTS = [
 ]
 
 setup(
-    name="mlflow_flavors",
+    name="mlflavors",
     description="""
-        mlflow-flavors: A repository for hosting MLflow custom flavors.
+        MLflavors: Custom MLflow flavors for open-source ML frameworks.
         """,
     long_description=open("README.rst").read(),
     long_description_content_type="text/x-rst",
-    author="Blue Pen Labs",
+    author="Benjamin Bluhm",
     license="BSD-3-Clause",
     license_files="LICENSE.txt",
-    url="https://github.com/blue-pen-labs/mlflow-flavors",
+    url="https://github.com/ml-toolkits/mlflavors",
     project_urls={
-        "Issue Tracker": "https://github.com/blue-pen-labs/mlflow-flavors/issues",
-        "Documentation": "https://mlflow-flavors.readthedocs.io/en/latest/",
+        "Issue Tracker": "https://github.com/ml-toolkits/mlflavors/issues",
+        "Documentation": "https://mlflavors.readthedocs.io/en/latest/",
     },
     packages=find_packages(exclude=["tests", "tests.*", "examples"]),
     setup_requires=["setuptools", "wheel"],

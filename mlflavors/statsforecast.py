@@ -1,10 +1,11 @@
 """
-The ``mlflow_flavors.orbit`` module provides an API for logging and loading orbit
-models. This module exports orbit models with the following flavors:
+The ``mlflavors.statsforecast`` module provides an API for logging and loading
+statsforecast models. This module exports statsforecast models with the following
+flavors:
 
-orbit (native) format
-    This is the main flavor that can be loaded back into orbit, which relies on pickle
-    internally to serialize a model.
+statsforecast (native) format
+    This is the main flavor that can be loaded back into statsforecast, which relies on
+    pickle internally to serialize a model.
 
     Note that pickle serialization requires using the same python environment (version)
     in whatever environment you're going to use this model for inference to ensure that
@@ -13,7 +14,7 @@ orbit (native) format
 :py:mod:`mlflow.pyfunc` format
     Produced for use by generic pyfunc-based deployment tools and batch inference.
 
-    The interface for utilizing an orbit model loaded as a ``pyfunc`` type for
+    The interface for utilizing an statsforecast model loaded as a ``pyfunc`` type for
     generating forecast predictions uses a *single-row* ``Pandas DataFrame``
     configuration argument. The following columns in this configuration
     ``Pandas DataFrame`` are supported:
@@ -26,29 +27,33 @@ orbit (native) format
         - Type
         - Description
       * - X
-        - numpy ndarray or list (required)
+        - numpy ndarray or list (optional)
         - | Exogenous regressor for future time period events.
           | For more information, read the underlying library explanation:
-          | https://orbit-ml.readthedocs.io/en/latest/.
+          | https://nixtla.github.io/statsforecast/.
+          | (Default: ``None``)
       * - X_cols
-        - list (required)
+        - list (optional)
         - | Column names of the exogenous regressor matrix
           | (Required to construct Pandas DataFrame inside model wrapper class).
-      * - X_dtypes (required)
-        - list (required)
+          | (Default: ``None``)
+      * - X_dtypes
+        - list (optional)
         - | Data types of the exogenous regressor matrix
           | (Required to construct Pandas DataFrame inside model wrapper class).
-      * - decompose
-        - bool (optional)
-        - | If True, returns each prediction component separately.
-          | (Default: ``False``)
-      * - store_prediction_array
-        - bool (optional)
-        - | If True, prediction array is stored.
-          | (Default: ``False``)
-      * - seed
-        - int (optional)
-        - | Seed in prediction is set to be random by default unless provided.
+          | (Default: ``None``)
+      * - h
+        - int (required)
+        - | Specifies the number of future periods to generate starting from the last
+          | datetime value of the training dataset, utilizing the frequency of the input
+          | training series when the model was trained. (for example, if the training
+          | data series elements represent one value per hour, in order to forecast 3
+          | hours of future data, set the column ``fh`` to ``3``.
+      * - level
+        - list (optional)
+        - | A list of floats with the confidence levels of the prediction intervals. For
+          | example, ``level=[95]`` means that the range of values should include the
+          | actual future value with probability 95%.
           | (Default: ``None``)
 """  # noqa: E501
 import logging
@@ -56,8 +61,9 @@ import os
 import pickle
 
 import mlflow
-import orbit
+import numpy as np
 import pandas as pd
+import statsforecast
 import yaml
 from mlflow import pyfunc
 from mlflow.exceptions import MlflowException
@@ -88,9 +94,9 @@ from mlflow.utils.model_utils import (
 )
 from mlflow.utils.requirements_utils import _get_pinned_requirement
 
-import mlflow_flavors
+import mlflavors
 
-FLAVOR_NAME = "orbit"
+FLAVOR_NAME = "statsforecast"
 
 SERIALIZATION_FORMAT_PICKLE = "pickle"
 SERIALIZATION_FORMAT_CLOUDPICKLE = "cloudpickle"
@@ -108,7 +114,7 @@ def get_default_pip_requirements(include_cloudpickle=False):
              flavor. Calls to :func:`save_model()` and :func:`log_model()` produce a pip
              environment that, at minimum, contains these requirements.
     """
-    pip_deps = [_get_pinned_requirement("orbit")]
+    pip_deps = [_get_pinned_requirement("statsforecast")]
     if include_cloudpickle:
         pip_deps += [_get_pinned_requirement("cloudpickle")]
 
@@ -127,7 +133,7 @@ def get_default_conda_env(include_cloudpickle=False):
 
 @format_docstring(LOG_MODEL_PARAM_DOCS.format(package_name=FLAVOR_NAME))
 def save_model(
-    orbit_model,
+    statsforecast_model,
     path,
     conda_env=None,
     code_paths=None,
@@ -139,13 +145,13 @@ def save_model(
     serialization_format=SERIALIZATION_FORMAT_PICKLE,
 ):
     """
-    Save an orbit model to a path on the local file system. Produces an MLflow Model
+    Save an statsforecast model to a path on the local file system. Produces an MLflow Model
     containing the following flavors:
 
-        - :py:mod:`mlflow_flavors.orbit`
+        - :py:mod:`mlflavors.statsforecast`
         - :py:mod:`mlflow.pyfunc`
 
-    :param orbit_model: Fitted orbit model object.
+    :param statsforecast_model: Fitted statsforecast model object.
     :param path: Local path where the model is to be saved.
     :param conda_env: {{ conda_env }}
     :param code_paths: A list of local filesystem paths to Python file dependencies (or
@@ -203,11 +209,13 @@ def save_model(
 
     model_data_subpath = "model.pkl"
     model_data_path = os.path.join(path, model_data_subpath)
-    _save_model(orbit_model, model_data_path, serialization_format=serialization_format)
+    _save_model(
+        statsforecast_model, model_data_path, serialization_format=serialization_format
+    )
 
     pyfunc.add_to_model(
         mlflow_model,
-        loader_module="mlflow_flavors.orbit",
+        loader_module="mlflavors.statsforecast",
         model_path=model_data_subpath,
         conda_env=_CONDA_ENV_FILE_NAME,
         python_env=_PYTHON_ENV_FILE_NAME,
@@ -217,7 +225,7 @@ def save_model(
     mlflow_model.add_flavor(
         FLAVOR_NAME,
         pickled_model=model_data_subpath,
-        orbit_version=orbit.__version__,
+        statsforecast_version=statsforecast.__version__,
         serialization_format=serialization_format,
         code=code_dir_subpath,
     )
@@ -259,7 +267,7 @@ def save_model(
 
 @format_docstring(LOG_MODEL_PARAM_DOCS.format(package_name=FLAVOR_NAME))
 def log_model(
-    orbit_model,
+    statsforecast_model,
     artifact_path,
     conda_env=None,
     code_paths=None,
@@ -273,13 +281,13 @@ def log_model(
     **kwargs,
 ):
     """
-    Log an orbit model as an MLflow artifact for the current run. Produces an MLflow
-    Model containing the following flavors:
+    Log an statsforecast model as an MLflow artifact for the current run. Produces an
+    MLflow Model containing the following flavors:
 
-        - :py:mod:`mlflow_flavors.orbit`
+        - :py:mod:`mlflavors.statsforecast`
         - :py:mod:`mlflow.pyfunc`
 
-    :param orbit_model: Fitted orbit model object.
+    :param statsforecast_model: Fitted statsforecast model object.
     :param artifact_path: Run-relative artifact path to save the model instance to.
     :param conda_env: {{ conda_env }}
     :param code_paths: A list of local filesystem paths to Python file dependencies (or
@@ -320,9 +328,9 @@ def log_model(
     """
     return Model.log(
         artifact_path=artifact_path,
-        flavor=mlflow_flavors.orbit,
+        flavor=mlflavors.statsforecast,
         registered_model_name=registered_model_name,
-        orbit_model=orbit_model,
+        statsforecast_model=statsforecast_model,
         conda_env=conda_env,
         code_paths=code_paths,
         signature=signature,
@@ -337,7 +345,7 @@ def log_model(
 
 def load_model(model_uri, dst_path=None):
     """
-    Load an orbit model from a local file or a run.
+    Load an statsforecast model from a local file or a run.
 
     :param model_uri: The location, in URI format, of the MLflow model, for example:
 
@@ -356,7 +364,7 @@ def load_model(model_uri, dst_path=None):
                      This directory must already exist. If unspecified, a local output
                      path will be created.
 
-    :return: An orbit model.
+    :return: An statsforecast model.
     """
     local_model_path = _download_artifact_from_uri(
         artifact_uri=model_uri, output_path=dst_path
@@ -365,12 +373,14 @@ def load_model(model_uri, dst_path=None):
         model_path=local_model_path, flavor_name=FLAVOR_NAME
     )
     _add_code_from_conf_to_system_path(local_model_path, flavor_conf)
-    orbit_model_file_path = os.path.join(local_model_path, flavor_conf["pickled_model"])
+    statsforecast_model_file_path = os.path.join(
+        local_model_path, flavor_conf["pickled_model"]
+    )
     serialization_format = flavor_conf.get(
         "serialization_format", SERIALIZATION_FORMAT_PICKLE
     )
     return _load_model(
-        path=orbit_model_file_path, serialization_format=serialization_format
+        path=statsforecast_model_file_path, serialization_format=serialization_format
     )
 
 
@@ -419,7 +429,8 @@ def _load_pyfunc(path):
     """
     Load PyFunc implementation. Called by ``pyfunc.load_model``.
 
-    :param path: Local filesystem path to the MLflow Model with the orbit flavor.
+    :param path: Local filesystem path to the MLflow Model with the statsforecast
+        flavor.
     """
     if os.path.isfile(path):
         serialization_format = SERIALIZATION_FORMAT_PICKLE
@@ -428,15 +439,15 @@ def _load_pyfunc(path):
         )
     else:
         try:
-            orbit_flavor_conf = _get_flavor_configuration(
+            statsforecast_flavor_conf = _get_flavor_configuration(
                 model_path=path, flavor_name=FLAVOR_NAME
             )
-            serialization_format = orbit_flavor_conf.get(
+            serialization_format = statsforecast_flavor_conf.get(
                 "serialization_format", SERIALIZATION_FORMAT_PICKLE
             )
         except MlflowException:
             _logger.warning(
-                "Could not find orbit flavor configuration during model "
+                "Could not find statsforecast flavor configuration during model "
                 "loading process. Assuming 'pickle' serialization format."
             )
             serialization_format = SERIALIZATION_FORMAT_PICKLE
@@ -446,14 +457,14 @@ def _load_pyfunc(path):
         )
         path = os.path.join(path, pyfunc_flavor_conf["model_path"])
 
-    return _OrbitModelWrapper(
+    return _StatsforecastModelWrapper(
         _load_model(path, serialization_format=serialization_format)
     )
 
 
-class _OrbitModelWrapper:
-    def __init__(self, orbit_model):
-        self.orbit_model = orbit_model
+class _StatsforecastModelWrapper:
+    def __init__(self, statsforecast_model):
+        self.statsforecast_model = statsforecast_model
 
     def predict(self, dataframe) -> pd.DataFrame:
         df_schema = dataframe.columns.values.tolist()
@@ -466,49 +477,30 @@ class _OrbitModelWrapper:
             )
 
         attrs = dataframe.to_dict(orient="index").get(0)
+        h = attrs.get("h")
         X = attrs.get("X")
         X_cols = attrs.get("X_cols")
         X_dtypes = attrs.get("X_dtypes")
-        decompose = attrs.get("decompose", False)
-        store_prediction_array = attrs.get("store_prediction_array", False)
-        seed = attrs.get("seed", None)
+        level = attrs.get("level")
 
-        if isinstance(X, type(None)):
+        if isinstance(h, type(None)):
             raise MlflowException(
                 f"The provided prediction configuration pd.DataFrame columns ({df_schema}) \
-                do not contain the required column `X` for specifying the regressor \
-                values.",
+                do not contain the required column `h` for specifying the forecast \
+                horizon.",
                 error_code=INVALID_PARAMETER_VALUE,
             )
 
-        if isinstance(X_cols, type(None)):
-            raise MlflowException(
-                f"The provided prediction configuration pd.DataFrame columns ({df_schema}) \
-                do not contain the required column `X_cols` for specifying the \
-                regressor columns.",
-                error_code=INVALID_PARAMETER_VALUE,
-            )
+        # Create Pandas DataFrame if exogenous regressor is provided
+        if isinstance(X, (list, np.ndarray)):
+            df = pd.DataFrame(data=X, columns=X_cols)
 
-        if isinstance(X_dtypes, type(None)):
-            raise MlflowException(
-                f"The provided prediction configuration pd.DataFrame columns ({df_schema}) \
-                do not contain the required column `X_dtypes` for specifying the \
-                regressor column types.",
-                error_code=INVALID_PARAMETER_VALUE,
-            )
+            # Cast columns to correct type
+            for col, dtype in zip(X_cols, X_dtypes):
+                df[col] = df[col].astype(dtype)
+        else:
+            df = None
 
-        # Create Pandas DataFrame as required by Orbit predict method
-        df = pd.DataFrame(data=X, columns=X_cols)
-
-        # Cast columns to correct type
-        for col, dtype in zip(X_cols, X_dtypes):
-            df[col] = df[col].astype(dtype)
-
-        predictions = self.orbit_model.predict(
-            df,
-            decompose=decompose,
-            store_prediction_array=store_prediction_array,
-            seed=seed,
-        )
+        predictions = self.statsforecast_model.predict(h=h, X_df=df, level=level)
 
         return predictions

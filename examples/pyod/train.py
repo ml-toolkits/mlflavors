@@ -6,7 +6,7 @@ from pyod.models.knn import KNN
 from pyod.utils.data import generate_data
 from sklearn.metrics import roc_auc_score
 
-import mlflow_flavors
+import mlflavors
 
 ARTIFACT_PATH = "model"
 
@@ -36,7 +36,7 @@ with mlflow.start_run() as run:
     mlflow.log_metrics(metrics)
 
     # Log model using pickle serialization (default).
-    mlflow_flavors.pyod.log_model(
+    mlflavors.pyod.log_model(
         pyod_model=clf,
         artifact_path=ARTIFACT_PATH,
         serialization_format="pickle",
@@ -44,8 +44,8 @@ with mlflow.start_run() as run:
     model_uri = mlflow.get_artifact_uri(ARTIFACT_PATH)
 
 # Load model in native pyod flavor and pyfunc flavor
-loaded_model = mlflow_flavors.pyod.load_model(model_uri=model_uri)
-loaded_pyfunc = mlflow_flavors.pyod.pyfunc.load_model(model_uri=model_uri)
+loaded_model = mlflavors.pyod.load_model(model_uri=model_uri)
+loaded_pyfunc = mlflavors.pyod.pyfunc.load_model(model_uri=model_uri)
 
 # Create configuration DataFrame
 predict_conf = pd.DataFrame(

@@ -4,7 +4,7 @@ from sdv.datasets.demo import download_demo
 from sdv.evaluation.single_table import evaluate_quality
 from sdv.lite import SingleTablePreset
 
-import mlflow_flavors
+import mlflavors
 
 ARTIFACT_PATH = "model"
 
@@ -31,7 +31,7 @@ with mlflow.start_run() as run:
     mlflow.log_metrics(metrics)
 
     # Log model using pickle serialization (default).
-    mlflow_flavors.sdv.log_model(
+    mlflavors.sdv.log_model(
         sdv_model=synthesizer,
         artifact_path=ARTIFACT_PATH,
         serialization_format="pickle",
@@ -39,8 +39,8 @@ with mlflow.start_run() as run:
     model_uri = mlflow.get_artifact_uri(ARTIFACT_PATH)
 
 # Load model in native sdv flavor and pyfunc flavor
-loaded_model = mlflow_flavors.sdv.load_model(model_uri=model_uri)
-loaded_pyfunc = mlflow_flavors.sdv.pyfunc.load_model(model_uri=model_uri)
+loaded_model = mlflavors.sdv.load_model(model_uri=model_uri)
+loaded_pyfunc = mlflavors.sdv.pyfunc.load_model(model_uri=model_uri)
 
 # Create configuration DataFrame
 predict_conf = pd.DataFrame(

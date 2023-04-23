@@ -6,7 +6,7 @@ from orbit.models import ETS
 from orbit.utils.dataset import load_iclaims
 from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error
 
-import mlflow_flavors
+import mlflavors
 
 ARTIFACT_PATH = "model"
 
@@ -60,7 +60,7 @@ with mlflow.start_run() as run:
     mlflow.log_metrics(metrics)
 
     # Log model using pickle serialization (default).
-    mlflow_flavors.orbit.log_model(
+    mlflavors.orbit.log_model(
         orbit_model=ets,
         artifact_path=ARTIFACT_PATH,
         serialization_format="pickle",
@@ -68,8 +68,8 @@ with mlflow.start_run() as run:
     model_uri = mlflow.get_artifact_uri(ARTIFACT_PATH)
 
 # Load model in native orbit flavor and pyfunc flavor
-loaded_model = mlflow_flavors.orbit.load_model(model_uri=model_uri)
-loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model(model_uri=model_uri)
+loaded_model = mlflavors.orbit.load_model(model_uri=model_uri)
+loaded_pyfunc = mlflavors.orbit.pyfunc.load_model(model_uri=model_uri)
 
 # Convert test data to 2D numpy array so it can be passed to pyfunc predict using
 # a single-row Pandas DataFrame configuration argument

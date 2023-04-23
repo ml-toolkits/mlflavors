@@ -1,12 +1,12 @@
 # .coveragerc to control coverage.py
 [run]
 branch = True
-source = mlflow_flavors
+source = mlflavors
 # omit = bad_file.py
 
 [paths]
 source =
-    mlflow_flavors/
+    mlflavors/
     */site-packages/
 
 [report]

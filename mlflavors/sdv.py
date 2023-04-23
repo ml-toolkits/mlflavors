@@ -1,10 +1,10 @@
 """
-The ``mlflow_flavors.pyod`` module provides an API for logging and loading
-pyod models. This module exports pyod models with the following
+The ``mlflavors.sdv`` module provides an API for logging and loading
+sdv models. This module exports sdv models with the following
 flavors:
 
-pyod (native) format
-    This is the main flavor that can be loaded back into pyod, which relies on
+sdv (native) format
+    This is the main flavor that can be loaded back into sdv, which relies on
     pickle internally to serialize a model.
 
     Note that pickle serialization requires using the same python environment (version)
@@ -14,7 +14,11 @@ pyod (native) format
 :py:mod:`mlflow.pyfunc` format
     Produced for use by generic pyfunc-based deployment tools and batch inference.
 
-    The interface for utilizing an pyod model loaded as a ``pyfunc`` type for
+    Currently only the ``sample`` method is supported in the ``pyfunc`` flavor.
+    Additional methods (e.g. ``sample_remaining_columns``) could be added in a similar
+    fashion.
+
+    The interface for utilizing an sdv model loaded as a ``pyfunc`` type for
     generating predictions uses a *single-row* ``Pandas DataFrame``
     configuration argument. The following columns in this configuration
     ``Pandas DataFrame`` are supported:
@@ -26,36 +30,53 @@ pyod (native) format
       * - Column
         - Type
         - Description
-      * - predict_method
+      * - modality
         - str (required)
-        - | Specifies the pyod predict method. The supported predict methods are
-          | ``predict``, ``predict_proba``, ``predict_confidence``, and
-          | ``decision_function``.
-      * - X
-        - numpy ndarray or list (required)
-        - | The input samples.
+        - | Specifies the sdv table modalities. The supported modalities are
+          | ``single_table``, ``multi_table``, and ``sequential``.
           | For more information, read the underlying library explanation:
-          | https://pyod.readthedocs.io/en/latest/index.html.
-      * - return_confidence
-        - bool (optional)
-        - | If True, returns prediction confidence as well.
-          | Can only be provided in combination with predict method ``predict`` and
-          | ``predict_proba``.
-          | (Default: ``False``)
-      * - method
+          | https://docs.sdv.dev/sdv/.
+      * - num_rows
+        - int (required)
+        - | An integer >0, describing the number of rows to sample.
+          | Can only be provided in combination with modality ``single_table``.
+      * - num_sequences
+        - int (required)
+        - | An integer >0, describing the number of sequences to sample.
+          | Can only be provided in combination with modality ``sequential``.
+      * - batch_size
+        - int (optional)
+        - | An integer >0, describing the number of rows to sample at a time.
+          | Can only be provided in combination with modality ``single_table``.
+          | (Default: ``num_rows``)
+      * - max_tries_per_batch
+        - int (optional)
+        - | An integer >0, describing the number of sampling attempts to make per batch.
+          | Can only be provided in combination with modality ``single_table``.
+          | (Default: ``100``)
+      * - output_file_path
         - str (optional)
-        - | The probability conversion method.
-          | Can only be provided in combination with predict method ``predict_proba``.
-          | (Default: ``linear``)
+        - | A string describing a CSV filepath for writing the synthetic data.
+          | Can only be provided in combination with modality ``single_table``.
+          | (Default: ``None``)
+      * - scale
+        - float (optional)
+        - | A float >0.0 that describes how much to scale the data by.
+          | Can only be provided in combination with modality ``multi_table``.
+          | (Default: ``1.0``)
+      * - sequence_length
+        - int (optional)
+        - | An integer >0 describing the length of each sequence.
+          | Can only be provided in combination with modality ``sequential``.
+          | (Default: ``None``)
 """  # noqa: E501
 import logging
 import os
 import pickle
 
 import mlflow
-import numpy as np
 import pandas as pd
-import pyod
+import sdv
 import yaml
 from mlflow import pyfunc
 from mlflow.exceptions import MlflowException
@@ -85,22 +106,15 @@ from mlflow.utils.model_utils import (
     _validate_and_prepare_target_save_path,
 )
 from mlflow.utils.requirements_utils import _get_pinned_requirement
-from pyod import version  # noqa: F401
 
-import mlflow_flavors
+import mlflavors
 
-FLAVOR_NAME = "pyod"
+FLAVOR_NAME = "sdv"
 
-PYOD_DECISION_FUNCTION = "decision_function"
-PYOD_PREDICT = "predict"
-PYOD_PREDICT_PROBA = "predict_proba"
-PYOD_PREDICT_CONFIDENCE = "predict_confidence"
-SUPPORTED_PYOD_PREDICT_METHODS = [
-    PYOD_PREDICT,
-    PYOD_PREDICT_PROBA,
-    PYOD_PREDICT_CONFIDENCE,
-    PYOD_DECISION_FUNCTION,
-]
+SDV_SINGLE_TABLE = "single_table"
+SDV_MULTI_TABLE = "multi_table"
+SDV_SEQUENTIAL = "sequential"
+SUPPORTED_SDV_MODALITIES = [SDV_SINGLE_TABLE, SDV_MULTI_TABLE, SDV_SEQUENTIAL]
 
 SERIALIZATION_FORMAT_PICKLE = "pickle"
 SERIALIZATION_FORMAT_CLOUDPICKLE = "cloudpickle"
@@ -118,7 +132,7 @@ def get_default_pip_requirements(include_cloudpickle=False):
              flavor. Calls to :func:`save_model()` and :func:`log_model()` produce a pip
              environment that, at minimum, contains these requirements.
     """
-    pip_deps = [_get_pinned_requirement("pyod")]
+    pip_deps = [_get_pinned_requirement("sdv")]
     if include_cloudpickle:
         pip_deps += [_get_pinned_requirement("cloudpickle")]
 
@@ -137,7 +151,7 @@ def get_default_conda_env(include_cloudpickle=False):
 
 @format_docstring(LOG_MODEL_PARAM_DOCS.format(package_name=FLAVOR_NAME))
 def save_model(
-    pyod_model,
+    sdv_model,
     path,
     conda_env=None,
     code_paths=None,
@@ -149,13 +163,13 @@ def save_model(
     serialization_format=SERIALIZATION_FORMAT_PICKLE,
 ):
     """
-    Save an pyod model to a path on the local file system. Produces an MLflow Model
+    Save an sdv model to a path on the local file system. Produces an MLflow Model
     containing the following flavors:
 
-        - :py:mod:`mlflow_flavors.pyod`
+        - :py:mod:`mlflavors.sdv`
         - :py:mod:`mlflow.pyfunc`
 
-    :param pyod_model: Fitted pyod model object.
+    :param sdv_model: Fitted sdv model object.
     :param path: Local path where the model is to be saved.
     :param conda_env: {{ conda_env }}
     :param code_paths: A list of local filesystem paths to Python file dependencies (or
@@ -213,11 +227,11 @@ def save_model(
 
     model_data_subpath = "model.pkl"
     model_data_path = os.path.join(path, model_data_subpath)
-    _save_model(pyod_model, model_data_path, serialization_format=serialization_format)
+    _save_model(sdv_model, model_data_path, serialization_format=serialization_format)
 
     pyfunc.add_to_model(
         mlflow_model,
-        loader_module="mlflow_flavors.pyod",
+        loader_module="mlflavors.sdv",
         model_path=model_data_subpath,
         conda_env=_CONDA_ENV_FILE_NAME,
         python_env=_PYTHON_ENV_FILE_NAME,
@@ -227,7 +241,7 @@ def save_model(
     mlflow_model.add_flavor(
         FLAVOR_NAME,
         pickled_model=model_data_subpath,
-        pyod_version=pyod.version.__version__,
+        sdv_version=sdv.__version__,
         serialization_format=serialization_format,
         code=code_dir_subpath,
     )
@@ -269,7 +283,7 @@ def save_model(
 
 @format_docstring(LOG_MODEL_PARAM_DOCS.format(package_name=FLAVOR_NAME))
 def log_model(
-    pyod_model,
+    sdv_model,
     artifact_path,
     conda_env=None,
     code_paths=None,
@@ -283,13 +297,13 @@ def log_model(
     **kwargs,
 ):
     """
-    Log an pyod model as an MLflow artifact for the current run. Produces an
+    Log an sdv model as an MLflow artifact for the current run. Produces an
     MLflow Model containing the following flavors:
 
-        - :py:mod:`mlflow_flavors.pyod`
+        - :py:mod:`mlflavors.sdv`
         - :py:mod:`mlflow.pyfunc`
 
-    :param pyod_model: Fitted pyod model object.
+    :param sdv_model: Fitted sdv model object.
     :param artifact_path: Run-relative artifact path to save the model instance to.
     :param conda_env: {{ conda_env }}
     :param code_paths: A list of local filesystem paths to Python file dependencies (or
@@ -330,9 +344,9 @@ def log_model(
     """
     return Model.log(
         artifact_path=artifact_path,
-        flavor=mlflow_flavors.pyod,
+        flavor=mlflavors.sdv,
         registered_model_name=registered_model_name,
-        pyod_model=pyod_model,
+        sdv_model=sdv_model,
         conda_env=conda_env,
         code_paths=code_paths,
         signature=signature,
@@ -347,7 +361,7 @@ def log_model(
 
 def load_model(model_uri, dst_path=None):
     """
-    Load an pyod model from a local file or a run.
+    Load an sdv model from a local file or a run.
 
     :param model_uri: The location, in URI format, of the MLflow model, for example:
 
@@ -366,7 +380,7 @@ def load_model(model_uri, dst_path=None):
                      This directory must already exist. If unspecified, a local output
                      path will be created.
 
-    :return: An pyod model.
+    :return: An sdv model.
     """
     local_model_path = _download_artifact_from_uri(
         artifact_uri=model_uri, output_path=dst_path
@@ -375,12 +389,12 @@ def load_model(model_uri, dst_path=None):
         model_path=local_model_path, flavor_name=FLAVOR_NAME
     )
     _add_code_from_conf_to_system_path(local_model_path, flavor_conf)
-    pyod_model_file_path = os.path.join(local_model_path, flavor_conf["pickled_model"])
+    sdv_model_file_path = os.path.join(local_model_path, flavor_conf["pickled_model"])
     serialization_format = flavor_conf.get(
         "serialization_format", SERIALIZATION_FORMAT_PICKLE
     )
     return _load_model(
-        path=pyod_model_file_path, serialization_format=serialization_format
+        path=sdv_model_file_path, serialization_format=serialization_format
     )
 
 
@@ -429,7 +443,7 @@ def _load_pyfunc(path):
     """
     Load PyFunc implementation. Called by ``pyfunc.load_model``.
 
-    :param path: Local filesystem path to the MLflow Model with the pyod
+    :param path: Local filesystem path to the MLflow Model with the sdv
         flavor.
     """
     if os.path.isfile(path):
@@ -439,15 +453,15 @@ def _load_pyfunc(path):
         )
     else:
         try:
-            pyod_flavor_conf = _get_flavor_configuration(
+            sdv_flavor_conf = _get_flavor_configuration(
                 model_path=path, flavor_name=FLAVOR_NAME
             )
-            serialization_format = pyod_flavor_conf.get(
+            serialization_format = sdv_flavor_conf.get(
                 "serialization_format", SERIALIZATION_FORMAT_PICKLE
             )
         except MlflowException:
             _logger.warning(
-                "Could not find pyod flavor configuration during model "
+                "Could not find sdv flavor configuration during model "
                 "loading process. Assuming 'pickle' serialization format."
             )
             serialization_format = SERIALIZATION_FORMAT_PICKLE
@@ -457,18 +471,16 @@ def _load_pyfunc(path):
         )
         path = os.path.join(path, pyfunc_flavor_conf["model_path"])
 
-    return _PyODModelWrapper(
+    return _SDVModelWrapper(
         _load_model(path, serialization_format=serialization_format)
     )
 
 
-class _PyODModelWrapper:
-    def __init__(self, pyod_model):
-        self.pyod_model = pyod_model
+class _SDVModelWrapper:
+    def __init__(self, sdv_model):
+        self.sdv_model = sdv_model
 
     def predict(self, dataframe) -> pd.DataFrame:
-        df_schema = dataframe.columns.values.tolist()
-
         if len(dataframe) > 1:
             raise MlflowException(
                 f"The provided prediction pd.DataFrame contains {len(dataframe)} rows. "
@@ -477,45 +489,39 @@ class _PyODModelWrapper:
             )
 
         attrs = dataframe.to_dict(orient="index").get(0)
-        X = attrs.get("X")
-        predict_method = attrs.get("predict_method")
+        modality = attrs.get("modality")
 
-        if isinstance(X, type(None)):
+        if modality not in SUPPORTED_SDV_MODALITIES:
             raise MlflowException(
-                f"The provided prediction configuration pd.DataFrame columns ({df_schema}) \
-                do not contain the required column `X` for specifying the regressor \
-                values.",
+                "Invalid `modality` value."
+                f"The supported modalities are \
+                {SUPPORTED_SDV_MODALITIES}",
                 error_code=INVALID_PARAMETER_VALUE,
             )
 
-        if predict_method not in SUPPORTED_PYOD_PREDICT_METHODS:
-            raise MlflowException(
-                "Invalid `predict_method` value."
-                f"The supported prediction methods are \
-                {SUPPORTED_PYOD_PREDICT_METHODS}",
-                error_code=INVALID_PARAMETER_VALUE,
+        if modality == SDV_SINGLE_TABLE:
+            num_rows = attrs.get("num_rows")
+            batch_size = attrs.get("batch_size", num_rows)
+            max_tries_per_batch = attrs.get("max_tries_per_batch", 100)
+            output_file_path = attrs.get("output_file_path", None)
+
+            predictions = self.sdv_model.sample(
+                num_rows=num_rows,
+                batch_size=batch_size,
+                max_tries_per_batch=max_tries_per_batch,
+                output_file_path=output_file_path,
             )
 
-        if isinstance(X, list):
-            X = np.array(X)
+        if modality == SDV_MULTI_TABLE:
+            scale = attrs.get("scale", 1.0)
+            predictions = [self.sdv_model.sample(scale=scale)]
 
-        if predict_method == PYOD_DECISION_FUNCTION:
-            predictions = self.pyod_model.decision_function(X)
-
-        if predict_method == PYOD_PREDICT:
-            return_confidence = attrs.get("return_confidence", False)
-            predictions = self.pyod_model.predict(
-                X, return_confidence=return_confidence
+        if modality == SDV_SEQUENTIAL:
+            num_sequences = attrs.get("num_sequences")
+            sequence_length = attrs.get("sequence_length", None)
+            predictions = self.sdv_model.sample(
+                num_sequences=num_sequences,
+                sequence_length=sequence_length,
             )
 
-        if predict_method == PYOD_PREDICT_PROBA:
-            method = attrs.get("method", "linear")
-            return_confidence = attrs.get("return_confidence", False)
-            predictions = self.pyod_model.predict_proba(
-                X, method=method, return_confidence=return_confidence
-            )
-
-        if predict_method == PYOD_PREDICT_CONFIDENCE:
-            predictions = self.pyod_model.predict_confidence(X)
-
-        return [predictions]
+        return predictions

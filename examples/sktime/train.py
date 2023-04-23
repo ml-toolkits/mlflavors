@@ -10,7 +10,7 @@ from sktime.performance_metrics.forecasting import (
     mean_absolute_percentage_error,
 )
 
-import mlflow_flavors
+import mlflavors
 
 ARTIFACT_PATH = "model"
 
@@ -43,7 +43,7 @@ with mlflow.start_run() as run:
     mlflow.log_metrics(metrics)
 
     # Log model using pickle serialization (default).
-    mlflow_flavors.sktime.log_model(
+    mlflavors.sktime.log_model(
         sktime_model=forecaster,
         artifact_path=ARTIFACT_PATH,
         serialization_format="pickle",
@@ -51,8 +51,8 @@ with mlflow.start_run() as run:
     model_uri = mlflow.get_artifact_uri(ARTIFACT_PATH)
 
 # Load model in native sktime flavor and pyfunc flavor
-loaded_model = mlflow_flavors.sktime.load_model(model_uri=model_uri)
-loaded_pyfunc = mlflow_flavors.sktime.pyfunc.load_model(model_uri=model_uri)
+loaded_model = mlflavors.sktime.load_model(model_uri=model_uri)
+loaded_pyfunc = mlflavors.sktime.pyfunc.load_model(model_uri=model_uri)
 
 # Convert test data to 2D numpy array so it can be passed to pyfunc predict using
 # a single-row Pandas DataFrame configuration argument
