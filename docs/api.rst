@@ -4,31 +4,31 @@ API reference
 Orbit
 -----
 
-.. automodule:: mlflow_flavors.orbit
+.. automodule:: mlflavors.orbit
     :members:
 
 Sktime
 ------
 
-.. automodule:: mlflow_flavors.sktime
+.. automodule:: mlflavors.sktime
     :members:
 
 
 StatsForecast
 -------------
 
-.. automodule:: mlflow_flavors.statsforecast
+.. automodule:: mlflavors.statsforecast
     :members:
 
 
 PyOD
 ----
 
-.. automodule:: mlflow_flavors.pyod
+.. automodule:: mlflavors.pyod
     :members:
 
 SDV
 ---
 
-.. automodule:: mlflow_flavors.sdv
+.. automodule:: mlflavors.sdv
     :members:

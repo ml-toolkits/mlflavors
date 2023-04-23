@@ -1,4 +1,4 @@
-mlflow-flavors Documentation
+Welcome to MLflavors` Documentation
 ===================================
 This package adds MLflow support for some popular machine learning frameworks currently not available as MLflow built-in flavors.
 The MLflow interface for the supported frameworks follows the design of built-in flavors.

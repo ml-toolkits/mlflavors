@@ -21,11 +21,11 @@ sys.path.insert(0, os.path.abspath("../examples/"))
 
 # -- Project information -----------------------------------------------------
 
-project = "mlflow-flavors"
-project_copyright = "Blue Pen Labs"
-author = "Blue Pen Labs"
+project = "MLflavors"
+project_copyright = "2023, Benjamin Bluhm"
+author = "Benjamin Bluhm"
 
-from mlflow_flavors.version import __version__
+from mlflavors.version import __version__
 
 # The short X.Y version.
 version = __version__
@@ -59,7 +59,8 @@ master_doc = "index"
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+# exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
@@ -79,7 +80,7 @@ html_theme_options = {
     "prev_next_buttons_location": "both",
     "style_external_links": True,
     "vcs_pageview_mode": "blob",
-    "style_nav_header_background": "gainsboro",
+#     "style_nav_header_background": "gainsboro",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
