@@ -1,9 +1,5 @@
 try:
-    from mlflavors import orbit
-    from mlflavors import pyod
-    from mlflavors import sdv
-    from mlflavors import sktime
-    from mlflavors import statsforecast
+    from mlflavors import orbit, pyod, sdv, sktime, statsforecast
 
     __all__ = [
         "orbit",

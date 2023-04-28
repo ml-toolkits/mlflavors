@@ -2,8 +2,8 @@
 MLflavors
 =========
 
-This package adds MLflow support for some popular machine learning frameworks currently
-not available as MLflow built-in flavors. The MLflow interface for the supported
+This package adds MLflow support for some popular ML frameworks currently
+not considered for inclusion as MLflow built-in flavors. The MLflow interface for the supported
 frameworks follows the design of built-in flavors.
 
 Using this package you can save your model as an MLflow artifact, load your model from
@@ -119,13 +119,14 @@ Documentation, examples, and API reference for mlflavors can be found
 Contributing
 ------------
 
-We welcome contributions from the community. To open an issue or request a new feature,
-please open a GitHub issue.
+Contributions from the community are highly welcome. I willbe happy to support the inclusion
+and development of new flavors. To open an issue or request a new feature, please
+open a GitHub issue.
 
 Versioning
 ----------
 
-We document versions and changes in our
+Versions and changes are documented in the
 `changelog <https://github.com/blue-pen-labs/mlflavors/tree/main/CHANGELOG.rst>`_ .
 
 Development

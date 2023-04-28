@@ -248,9 +248,7 @@ def test_predict_var_signature_saved_correctly(
     """Test saving of mlflow signature for native sktime predict_var method."""
     prediction = auto_arima_model.predict_var(fh=FH)
     signature = infer_signature(data_airline, prediction) if use_signature else None
-    mlflavors.sktime.save_model(
-        auto_arima_model, path=model_path, signature=signature
-    )
+    mlflavors.sktime.save_model(auto_arima_model, path=model_path, signature=signature)
     mlflow_model = Model.load(model_path)
     assert signature == mlflow_model.signature
 
@@ -263,12 +261,8 @@ def test_signature_and_example_for_pyfunc_predict_inteval(
     """Test saving of mlflow signature and example for pyfunc predict."""
     model_path_primary = model_path.joinpath("primary")
     model_path_secondary = model_path.joinpath("secondary")
-    mlflavors.sktime.save_model(
-        sktime_model=auto_arima_model, path=model_path_primary
-    )
-    loaded_pyfunc = mlflavors.sktime.pyfunc.load_model(
-        model_uri=model_path_primary
-    )
+    mlflavors.sktime.save_model(sktime_model=auto_arima_model, path=model_path_primary)
+    loaded_pyfunc = mlflavors.sktime.pyfunc.load_model(model_uri=model_path_primary)
     predict_conf = pd.DataFrame(
         [
             {
@@ -303,12 +297,8 @@ def test_signature_for_pyfunc_predict_quantiles(
     """Test saving of mlflow signature for pyfunc sktime predict_quantiles method."""
     model_path_primary = model_path.joinpath("primary")
     model_path_secondary = model_path.joinpath("secondary")
-    mlflavors.sktime.save_model(
-        sktime_model=auto_arima_model, path=model_path_primary
-    )
-    loaded_pyfunc = mlflavors.sktime.pyfunc.load_model(
-        model_uri=model_path_primary
-    )
+    mlflavors.sktime.save_model(sktime_model=auto_arima_model, path=model_path_primary)
+    loaded_pyfunc = mlflavors.sktime.pyfunc.load_model(model_uri=model_path_primary)
     predict_conf = pd.DataFrame(
         [
             {

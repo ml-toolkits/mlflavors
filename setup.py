@@ -8,7 +8,7 @@ PACKAGE_REQUIREMENTS = [
     "datasetsforecast==0.0.8",
     "mlflow",
     "scikit-learn",
-    # "orbit-ml",
+    "orbit-ml",
     "pmdarima",
     "sktime",
     "statsforecast",
