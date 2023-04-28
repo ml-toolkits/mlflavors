@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.1.0 - (development)
+0.1.0
 ---------------------
 mlflavors 0.1.0 is the initial release.
 
