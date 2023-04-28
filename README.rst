@@ -3,12 +3,11 @@ MLflavors
 =========
 
 This package adds MLflow support for some popular ML frameworks currently
-not considered for inclusion as MLflow built-in flavors. The MLflow interface for the supported
-frameworks follows the design of built-in flavors.
+not considered for inclusion as MLflow built-in flavors. The MLflow interface
+for the supported frameworks follows the design of built-in flavors.
 
-Using this package you can save your model as an MLflow artifact, load your model from
-MLflow for batch inference, or serve your model for real-time inference to a REST API
-endpoint.
+Using this package you can save your trained model as an MLflow artifact and
+serve the model for batch and real-time inference to an endpoint in the cloud.
 
 
 Supported frameworks
@@ -20,22 +19,22 @@ The following open-source libraris are currently supported:
       :header-rows: 1
 
       * - Framework
-        - Quickstart
+        - Tutorials
         - Category
       * - `Orbit <https://github.com/uber/orbit>`_
-        - `MLflow-Orbit Example <https://mlflavors.readthedocs.io/en/latest/examples.html#orbit>`_
+        - `MLflow-Orbit <https://mlflavors.readthedocs.io/en/latest/examples.html#orbit>`_
         - Time Series Forecasting
       * - `Sktime <https://github.com/sktime/sktime>`_
-        - `MLflow-Sktime Example <https://mlflavors.readthedocs.io/en/latest/examples.html#sktime>`_
+        - `MLflow-Sktime <https://mlflavors.readthedocs.io/en/latest/examples.html#sktime>`_
         - Time Series Forecasting
       * - `StatsForecast <https://github.com/Nixtla/statsforecast>`_
-        - `MLflow-StatsForecast Example <https://mlflavors.readthedocs.io/en/latest/examples.html#statsforecast>`_
+        - `MLflow-StatsForecast <https://mlflavors.readthedocs.io/en/latest/examples.html#statsforecast>`_
         - Time Series Forecasting
       * - `PyOD <https://github.com/yzhao062/pyod>`_
-        - `MLflow-PyOD Example <https://mlflavors.readthedocs.io/en/latest/examples.html#pyod>`_
+        - `MLflow-PyOD <https://mlflavors.readthedocs.io/en/latest/examples.html#pyod>`_
         - Anomaly Detection
       * - `SDV <https://github.com/sdv-dev/SDV>`_
-        - `MLflow-SDV Example <https://mlflavors.readthedocs.io/en/latest/examples.html#sdv>`_
+        - `MLflow-SDV <https://mlflavors.readthedocs.io/en/latest/examples.html#sdv>`_
         - Synthetic Data Generation
 
 Installation
@@ -50,7 +49,7 @@ Installing from PyPI:
 Quickstart
 ----------
 
-Save an ``orbit`` ETS model as an artifact to MLflow:
+Save an `Orbit <https://github.com/uber/orbit>`_ ETS model as an artifact to MLflow:
 
 .. code-block:: python
 
@@ -83,7 +82,11 @@ Make a prediction loading the model from MLflow in native format:
 .. code-block:: python
 
     loaded_model = mlflow_flavors.orbit.load_model("model")
-    loaded_model.predict(test_df, decompose=True, store_prediction_array=True, seed=2023)
+    print(
+        loaded_model.predict(
+            test_df, decompose=True, store_prediction_array=True, seed=2023
+        )
+    )
 
 Make a prediction loading the model from MLflow in ``pyfunc`` format:
 
@@ -108,7 +111,7 @@ Make a prediction loading the model from MLflow in ``pyfunc`` format:
     )
 
     loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model("model")
-    loaded_pyfunc.predict(predict_conf)
+    print(loaded_pyfunc.predict(predict_conf))
 
 Documentation
 -------------
@@ -119,8 +122,8 @@ Documentation, examples, and API reference for mlflavors can be found
 Contributing
 ------------
 
-Contributions from the community are highly welcome. I willbe happy to support the inclusion
-and development of new flavors. To open an issue or request a new feature, please
+Contributions from the community are more than welcome. I will be happy to support the inclusion
+and development of new features and flavors. To open an issue or request a new feature, please
 open a GitHub issue.
 
 Versioning

@@ -34,7 +34,7 @@ DOC_REQUIREMENTS = [
 setup(
     name="mlflavors",
     description="""
-        MLflavors: Custom MLflow flavors for open-source ML frameworks.
+        MLflavors: A collection of custom MLflow flavors.
         """,
     long_description=open("README.rst").read(),
     long_description_content_type="text/x-rst",
