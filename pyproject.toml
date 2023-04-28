@@ -34,3 +34,9 @@ line_length = 88
 convention = "numpy"
 match = '(?!test_|conftest).*\.py'
 add-ignore = ["D100", "D101","D104", "D205", "D400"]
+
+[build-system]
+requires = [
+    "setuptools>=66.0.0",
+    "wheel",
+]
