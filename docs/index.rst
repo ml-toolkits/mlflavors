@@ -34,7 +34,7 @@ What you can use this package for:
 - Save your trained model as an MLflow artifact
 - Load your model from MLflow for batch inference tasks
 - Serve your model for real-time inference to an endpoint in the cloud
-  (e.g. Databricks, Azure ML, AWS Sagemaker, etc.) using standard MLflow built-in deployment tools
+  (e.g. Databricks, Azure ML, AWS Sagemaker, etc.) using MLflow built-in deployment tools
 - Get inspiration for building your own MLflow custom flavor
 
 .. toctree::
