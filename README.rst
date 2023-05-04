@@ -130,7 +130,7 @@ Versioning
 ----------
 
 Versions and changes are documented in the
-`changelog <https://github.com/blue-pen-labs/mlflavors/tree/main/CHANGELOG.rst>`_ .
+`changelog <https://github.com/ml-toolkits/mlflavors/tree/main/CHANGELOG.rst>`_ .
 
 Development
 -----------
