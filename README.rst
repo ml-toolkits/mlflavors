@@ -2,17 +2,10 @@
 MLflavors
 =========
 
-This package adds MLflow support for some popular ML frameworks currently
+The MLflavors package adds MLflow support for some popular machine learning frameworks currently
 not considered for inclusion as MLflow built-in flavors. The MLflow interface
 for the supported frameworks closely follows the design of built-in flavors.
 
-Using this package you can save your trained model as an MLflow artifact, load
-your saved model from MLflow for batch inference, and deploy your model for
-real-time inference to a serving endpoint in the cloud.
-
-
-Supported frameworks
---------------------
 The following open-source libraries are currently supported:
 
     .. list-table::
@@ -38,6 +31,14 @@ The following open-source libraries are currently supported:
         - `MLflow-SDV <https://mlflavors.readthedocs.io/en/latest/examples.html#sdv>`_
         - Synthetic Data Generation
 
+What you can use this package for:
+
+- Save your trained model as an MLflow artifact
+- Load your model from MLflow for batch inference tasks
+- Serve your model for real-time inference to an endpoint in the cloud
+  (e.g. Databricks, Azure ML, AWS Sagemaker, etc.) using standard MLflow built-in deployment tools
+- Get inspiration for building your own MLflow custom flavor
+
 Installation
 ------------
 
@@ -54,7 +55,7 @@ Save an `Orbit <https://github.com/uber/orbit>`_ ETS model as an artifact to MLf
 
 .. code-block:: python
 
-    import mlflow_flavors
+    import mlflavors
 
     from orbit.models import ETS
     from orbit.utils.dataset import load_iclaims
@@ -73,7 +74,7 @@ Save an `Orbit <https://github.com/uber/orbit>`_ ETS model as an artifact to MLf
     )
     ets.fit(df=train_df)
 
-    mlflow_flavors.orbit.save_model(
+    mlflavors.orbit.save_model(
         orbit_model=ets,
         path="model",
     )
@@ -82,7 +83,7 @@ Make a prediction loading the model from MLflow in native format:
 
 .. code-block:: python
 
-    loaded_model = mlflow_flavors.orbit.load_model("model")
+    loaded_model = mlflavors.orbit.load_model("model")
     print(
         loaded_model.predict(
             test_df, decompose=True, store_prediction_array=True, seed=2023
@@ -111,7 +112,7 @@ Make a prediction loading the model from MLflow in ``pyfunc`` format:
         ]
     )
 
-    loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model("model")
+    loaded_pyfunc = mlflavors.orbit.pyfunc.load_model("model")
     print(loaded_pyfunc.predict(predict_conf))
 
 Documentation
