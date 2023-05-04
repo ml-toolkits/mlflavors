@@ -13,7 +13,7 @@ real-time inference to a serving endpoint in the cloud.
 
 Supported frameworks
 --------------------
-The following open-source libraris are currently supported:
+The following open-source libraries are currently supported:
 
     .. list-table::
       :widths: 15 10 15
