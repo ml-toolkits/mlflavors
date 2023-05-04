@@ -16,25 +16,25 @@ Supported frameworks
 The following open-source libraris are currently supported:
 
     .. list-table::
-        :widths: 15 10 15
-        :header-rows: 1
+      :widths: 15 10 15
+      :header-rows: 1
 
-        * - Framework
+      * - Framework
         - Tutorials
         - Category
-        * - `Orbit <https://github.com/uber/orbit>`_
+      * - `Orbit <https://github.com/uber/orbit>`_
         - `MLflow-Orbit <https://mlflavors.readthedocs.io/en/latest/examples.html#orbit>`_
         - Time Series Forecasting
-        * - `Sktime <https://github.com/sktime/sktime>`_
+      * - `Sktime <https://github.com/sktime/sktime>`_
         - `MLflow-Sktime <https://mlflavors.readthedocs.io/en/latest/examples.html#sktime>`_
         - Time Series Forecasting
-        * - `StatsForecast <https://github.com/Nixtla/statsforecast>`_
+      * - `StatsForecast <https://github.com/Nixtla/statsforecast>`_
         - `MLflow-StatsForecast <https://mlflavors.readthedocs.io/en/latest/examples.html#statsforecast>`_
         - Time Series Forecasting
-        * - `PyOD <https://github.com/yzhao062/pyod>`_
+      * - `PyOD <https://github.com/yzhao062/pyod>`_
         - `MLflow-PyOD <https://mlflavors.readthedocs.io/en/latest/examples.html#pyod>`_
         - Anomaly Detection
-        * - `SDV <https://github.com/sdv-dev/SDV>`_
+      * - `SDV <https://github.com/sdv-dev/SDV>`_
         - `MLflow-SDV <https://mlflavors.readthedocs.io/en/latest/examples.html#sdv>`_
         - Synthetic Data Generation
 
