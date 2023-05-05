@@ -10,7 +10,6 @@ built-in flavors to save and load your models. Some of the key benefits are list
   (e.g. Databricks, Azure ML, AWS Sagemaker, etc.) using MLflow built-in deployment tools
 - Get inspiration for creating your own MLflow custom flavor
 
-The MLflow interface for the supported frameworks closely follows the design of built-in flavors.
 The following open-source libraries are currently supported:
 
     .. list-table::
@@ -36,6 +35,7 @@ The following open-source libraries are currently supported:
         - `MLflow-SDV <https://mlflavors.readthedocs.io/en/latest/examples.html#sdv>`_
         - Synthetic Data Generation
 
+The MLflow interface for the supported frameworks closely follows the design of built-in flavors.
 
 .. toctree::
    :maxdepth: 2
