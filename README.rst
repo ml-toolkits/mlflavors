@@ -2,17 +2,17 @@
 MLflavors
 =========
 
-This package adds MLflow support for some popular ML frameworks currently
-not considered for inclusion as MLflow built-in flavors. The MLflow interface
-for the supported frameworks follows the design of built-in flavors.
+The MLflavors package adds MLflow support for some popular machine learning frameworks currently
+not considered for inclusion as MLflow built-in flavors. You can use this package just like MLflow
+built-in flavors to save and load your models. Some of the key benefits are listed below:
 
-Using this package you can save your trained model as an MLflow artifact and
-serve the model for batch and real-time inference to an endpoint in the cloud.
+- Save your trained model as an MLflow artifact
+- Load your model from MLflow for batch inference tasks
+- Serve your model for real-time inference to an endpoint in the cloud
+  (e.g. Databricks, Azure ML, AWS Sagemaker, etc.) using MLflow built-in deployment tools
+- Get inspiration for creating your own MLflow custom flavor
 
-
-Supported frameworks
---------------------
-The following open-source libraris are currently supported:
+The following open-source libraries are currently supported:
 
     .. list-table::
       :widths: 15 10 15
@@ -37,6 +37,15 @@ The following open-source libraris are currently supported:
         - `MLflow-SDV <https://mlflavors.readthedocs.io/en/latest/examples.html#sdv>`_
         - Synthetic Data Generation
 
+The MLflow interface for the supported frameworks closely follows the design of built-in flavors.
+
+Documentation
+-------------
+
+Usage examples for all flavors and the API reference can be found in the package
+`documenation <https://mlflavors.readthedocs.io/en/latest/index.html>`_.
+
+
 Installation
 ------------
 
@@ -53,7 +62,7 @@ Save an `Orbit <https://github.com/uber/orbit>`_ ETS model as an artifact to MLf
 
 .. code-block:: python
 
-    import mlflow_flavors
+    import mlflavors
 
     from orbit.models import ETS
     from orbit.utils.dataset import load_iclaims
@@ -72,7 +81,7 @@ Save an `Orbit <https://github.com/uber/orbit>`_ ETS model as an artifact to MLf
     )
     ets.fit(df=train_df)
 
-    mlflow_flavors.orbit.save_model(
+    mlflavors.orbit.save_model(
         orbit_model=ets,
         path="model",
     )
@@ -81,12 +90,8 @@ Make a prediction loading the model from MLflow in native format:
 
 .. code-block:: python
 
-    loaded_model = mlflow_flavors.orbit.load_model("model")
-    print(
-        loaded_model.predict(
-            test_df, decompose=True, store_prediction_array=True, seed=2023
-        )
-    )
+    loaded_model = mlflavors.orbit.load_model("model")
+    loaded_model.predict(test_df, decompose=True, store_prediction_array=True, seed=2023)
 
 Make a prediction loading the model from MLflow in ``pyfunc`` format:
 
@@ -110,19 +115,13 @@ Make a prediction loading the model from MLflow in ``pyfunc`` format:
         ]
     )
 
-    loaded_pyfunc = mlflow_flavors.orbit.pyfunc.load_model("model")
-    print(loaded_pyfunc.predict(predict_conf))
-
-Documentation
--------------
-
-Documentation, examples, and API reference for mlflavors can be found
-`here <https://mlflavors.readthedocs.io/en/latest/index.html>`_.
+    loaded_pyfunc = mlflavors.orbit.pyfunc.load_model("model")
+    loaded_pyfunc.predict(predict_conf)
 
 Contributing
 ------------
 
-Contributions from the community are more than welcome. I will be happy to support the inclusion
+Contributions from the community are welcome, I will be happy to support the inclusion
 and development of new features and flavors. To open an issue or request a new feature, please
 open a GitHub issue.
 
@@ -130,7 +129,7 @@ Versioning
 ----------
 
 Versions and changes are documented in the
-`changelog <https://github.com/blue-pen-labs/mlflavors/tree/main/CHANGELOG.rst>`_ .
+`changelog <https://github.com/ml-toolkits/mlflavors/tree/main/CHANGELOG.rst>`_ .
 
 Development
 -----------
@@ -161,7 +160,7 @@ Run tests:
 
     $ pytest tests/unit --cov
 
-Build package documentation:
+Build Sphinx docs:
 
 .. code-block:: bash
 
