@@ -3,9 +3,16 @@ MLflavors
 =========
 
 The MLflavors package adds MLflow support for some popular machine learning frameworks currently
-not considered for inclusion as MLflow built-in flavors. The MLflow interface
-for the supported frameworks closely follows the design of built-in flavors.
+not considered for inclusion as MLflow built-in flavors. You can use this package just like MLflow
+built-in flavors to save and load your models. Some of the key benefits are listed below:
 
+- Save your trained model as an MLflow artifact
+- Load your model from MLflow for batch inference tasks
+- Serve your model for real-time inference to an endpoint in the cloud
+  (e.g. Databricks, Azure ML, AWS Sagemaker, etc.) using MLflow built-in deployment tools
+- Get inspiration for creating your own MLflow custom flavor
+
+The MLflow interface for the supported frameworks closely follows the design of built-in flavors.
 The following open-source libraries are currently supported:
 
     .. list-table::
@@ -30,14 +37,6 @@ The following open-source libraries are currently supported:
       * - `SDV <https://github.com/sdv-dev/SDV>`_
         - `MLflow-SDV <https://mlflavors.readthedocs.io/en/latest/examples.html#sdv>`_
         - Synthetic Data Generation
-
-What you can use this package for:
-
-- Save your trained model as an MLflow artifact
-- Load your model from MLflow for batch inference tasks
-- Serve your model for real-time inference to an endpoint in the cloud
-  (e.g. Databricks, Azure ML, AWS Sagemaker, etc.) using MLflow built-in deployment tools
-- Get inspiration for building your own MLflow custom flavor
 
 Documentation
 -------------
