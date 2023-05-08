@@ -8,12 +8,15 @@ PACKAGE_REQUIREMENTS = [
     "datasetsforecast==0.0.8",
     "mlflow",
     "scikit-learn",
-    "orbit-ml",
     "pmdarima",
     "sktime",
     "statsforecast",
     "pyod",
     "sdv",
+]
+
+ORBIT_REQUIREMENTS = [
+    "orbit-ml",
 ]
 
 DEV_REQUIREMENTS = [
@@ -22,9 +25,6 @@ DEV_REQUIREMENTS = [
     "pytest-cov",
     "setuptools",
     "tomli",
-]
-
-DOC_REQUIREMENTS = [
     "nbsphinx==0.9.1",
     "numpydoc==1.5.0",
     "sphinx_rtd_theme==1.1.1",
@@ -51,7 +51,7 @@ setup(
     install_requires=PACKAGE_REQUIREMENTS,
     extras_require={
         "dev": DEV_REQUIREMENTS,
-        "docs": DOC_REQUIREMENTS,
+        "orbit": ORBIT_REQUIREMENTS,
     },
     version=__version__,
     keywords="machine-learning ai mlflow",

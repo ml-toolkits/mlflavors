@@ -5,6 +5,13 @@ This example trains an `Orbit <https://github.com/orbit/orbit>`_ Bayesian ETS mo
 using the iclaims dataset which contains the weekly initial claims for US unemployment
 benefits against a few related Google trend queries from Jan 2010 - June 2018.
 
+Installation
+~~~~~~~~~~~~
+
+.. code-block:: bash
+
+    pip install mlflavors[orbit]
+
 Model logging and loading
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
