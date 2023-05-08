@@ -29,6 +29,7 @@ DEV_REQUIREMENTS = [
     "numpydoc==1.5.0",
     "sphinx_rtd_theme==1.1.1",
     "sphinx==5.3.0",
+    "urllib3<2",
 ]
 
 setup(
