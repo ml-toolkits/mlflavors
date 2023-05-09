@@ -44,7 +44,6 @@ jobs:
 
     - name: Run unit tests
       run: |
-        echo "Running pytest"
         pytest --ignore=tests/test_orbit_model_export.py
 
   unit-tests-soft-deps:
@@ -68,8 +67,10 @@ jobs:
 
     - name: Run unit tests
       run: |
-        echo "Running pytest"
-        pytest
+        python -m pytest
+
+    - name: Publish code coverage
+      uses: codecov/codecov-action@v3
 
   examples:
     needs: [unit-tests-no-soft-deps, unit-tests-soft-deps]

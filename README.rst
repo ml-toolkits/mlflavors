@@ -3,15 +3,9 @@ MLflavors
 =========
 
 The MLflavors package adds MLflow support for some popular machine learning frameworks currently
-not considered for inclusion as MLflow built-in flavors. You can use this package just like MLflow
-built-in flavors to save and load your models. Some of the key benefits are listed below:
-
-- Save your trained model as an MLflow artifact
-- Load your model from MLflow for batch inference tasks
-- Serve your model for real-time inference to an endpoint in the cloud
-  (e.g. Databricks, Azure ML, AWS Sagemaker, etc.) using MLflow built-in deployment tools
-- Get inspiration for creating your own MLflow custom flavor
-
+not considered for inclusion as MLflow built-in flavors. Just like built-in flavors, you can use
+this package to save your model as an MLflow artifact, load your model from MLflow for batch
+inference, and deploy your model to a serving endpoint using MLflow deployment tools.
 The following open-source libraries are currently supported:
 
     .. list-table::
@@ -41,6 +35,23 @@ The MLflow interface for the supported frameworks closely follows the design of 
 Particularly, the interface for utilizing the custom model loaded as a ``pyfunc`` flavor
 for generating predictions uses a single-row Pandas DataFrame configuration argument to expose the
 parameters of the flavor's inference API.
+
+|tests| |docs| |pypi| |license|
+
+.. |tests| image:: https://img.shields.io/github/actions/workflow/status/ml-toolkits/mlflavors/ci.yml?style=for-the-badge&logo=github
+    :target: https://github.com/ml-toolkits/mlflavors/actions/workflows/ci.yml/
+
+.. |docs| image:: https://img.shields.io/readthedocs/mlflavors/latest.svg?style=for-the-badge&logoColor=white
+    :target: https://mlflavors.readthedocs.io/en/latest/index.html
+    :alt: Latest Docs
+
+.. |pypi| image:: https://img.shields.io/pypi/v/mlflavors.svg?style=for-the-badge&logo=pypi&logoColor=white
+    :target: https://pypi.org/project/mlflavors/
+    :alt: Latest Python Release
+
+.. |license| image:: https://img.shields.io/badge/License-BSD--3--Clause-blue?style=for-the-badge
+    :target: https://opensource.org/license/bsd-3-clause/
+    :alt: BSD-3-Clause License
 
 Documentation
 -------------
