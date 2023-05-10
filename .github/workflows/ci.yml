@@ -25,110 +25,98 @@ jobs:
 
   unit-tests-no-soft-deps:
     needs: precommit-hooks
-    strategy:
-      matrix:
-        python-version: ['3.8'] #, '3.9', '3.10']
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Python setup
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Python setup
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e ".[dev]"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
 
-    - name: Run unit tests
-      run: |
-        pytest --ignore=tests/test_orbit_model_export.py
+      - name: Run unit tests
+        run: |
+          pytest --ignore=tests/test_orbit_model_export.py
 
   unit-tests-soft-deps:
     needs: unit-tests-no-soft-deps
     strategy:
       matrix:
-        python-version: ['3.8'] #, '3.9', '3.10']
+        python-version: ['3.8', '3.9']
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Python setup
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Python setup
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e ".[dev,orbit]"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,orbit]"
 
-    - name: Run unit tests
-      run: |
-        python -m pytest
+      - name: Run unit tests
+        run: |
+          python -m pytest
 
-    - name: Publish code coverage
-      uses: codecov/codecov-action@v3
+      - name: Publish code coverage
+        if: matrix.python-version == '3.9'
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   examples:
     needs: [unit-tests-no-soft-deps, unit-tests-soft-deps]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - uses: actions/setup-python@v4
-      with:
-        python-version: 3.9
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e ".[orbit]"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install datasetsforecast==0.0.8
+          pip install -e ".[orbit]"
 
-    - name: Run examples
-      run: |
-        echo "Running Orbit example"
-        python examples/orbit/train.py
-
-        echo "Running Sktime example"
-        python examples/sktime/train.py
-
-        echo "Running StatsForecast example"
-        python examples/statsforecast/train.py
-
-        echo "Running PyOD example"
-        python examples/pyod/train.py
-
-        echo "Running SDV example"
-        python examples/sdv/train.py
+      - name: Run examples
+        run: |
+          ./build_tools/run_examples.sh
 
   documentation:
     needs: examples
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.9
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e ".[dev]"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
 
-    - name: Build documentation
-      run: |
-        echo "Building documentation"
-        cd docs
-        make clean
-        make html
+      - name: Build documentation
+        run: |
+          echo "Building documentation"
+          cd docs
+          make clean
+          make html
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: sphinx
-        path: docs/build/html
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sphinx
+          path: docs/build/html

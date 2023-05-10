@@ -1,5 +1,11 @@
+mlflow
 nbsphinx==0.9.1
 numpydoc==1.5.0
+orbit-ml
+pyod
+sdv
+sktime
 sphinx==5.3.0
 sphinx_rtd_theme==1.1.1
+statsforecast
 urllib3<2
