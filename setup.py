@@ -18,6 +18,7 @@ ORBIT_REQUIREMENTS = [
 
 DEV_REQUIREMENTS = [
     "datasetsforecast==0.0.8",
+    "pmdarima",
     "pre-commit",
     "pytest",
     "pytest-cov",
