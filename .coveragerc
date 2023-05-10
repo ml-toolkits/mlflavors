@@ -6,3 +6,4 @@ source = mlflavors
 omit =
     */setup.py
     */mlflavors/__init__.py
+    */mlflavors/version.py

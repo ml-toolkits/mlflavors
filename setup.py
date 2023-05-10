@@ -5,10 +5,7 @@ from setuptools import find_packages, setup
 from mlflavors.version import __version__
 
 PACKAGE_REQUIREMENTS = [
-    "datasetsforecast==0.0.8",
     "mlflow",
-    "scikit-learn",
-    "pmdarima",
     "sktime",
     "statsforecast",
     "pyod",
@@ -20,6 +17,8 @@ ORBIT_REQUIREMENTS = [
 ]
 
 DEV_REQUIREMENTS = [
+    "datasetsforecast==0.0.8",
+    "pmdarima",
     "pre-commit",
     "pytest",
     "pytest-cov",

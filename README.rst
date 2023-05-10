@@ -6,6 +6,7 @@ The MLflavors package adds MLflow support for some popular machine learning fram
 not considered for inclusion as MLflow built-in flavors. Just like built-in flavors, you can use
 this package to save your model as an MLflow artifact, load your model from MLflow for batch
 inference, and deploy your model to a serving endpoint using MLflow deployment tools.
+
 The following open-source libraries are currently supported:
 
     .. list-table::
@@ -36,10 +37,13 @@ Particularly, the interface for utilizing the custom model loaded as a ``pyfunc`
 for generating predictions uses a single-row Pandas DataFrame configuration argument to expose the
 parameters of the flavor's inference API.
 
-|tests| |docs| |pypi| |license|
+|tests| |coverage| |docs| |pypi| |license|
 
 .. |tests| image:: https://img.shields.io/github/actions/workflow/status/ml-toolkits/mlflavors/ci.yml?style=for-the-badge&logo=github
     :target: https://github.com/ml-toolkits/mlflavors/actions/workflows/ci.yml/
+
+.. |coverage| image:: https://img.shields.io/codecov/c/github/ml-toolkits/mlflavors?style=for-the-badge&label=codecov&logo=codecov
+    :target: https://codecov.io/gh/ml-toolkits/mlflavors
 
 .. |docs| image:: https://img.shields.io/readthedocs/mlflavors/latest.svg?style=for-the-badge&logoColor=white
     :target: https://mlflavors.readthedocs.io/en/latest/index.html
