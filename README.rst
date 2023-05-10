@@ -246,7 +246,7 @@ Run tests:
 
 .. code-block:: bash
 
-    $ pytest tests/unit --cov
+    $ pytest
 
 Build Sphinx docs:
 
