@@ -1,9 +1,10 @@
 Welcome to MLflavors` Documentation
 ===================================
-The `MLflavors <https://github.com/ml-toolkits/mlflavors>`_ package adds MLflow support for some popular machine learning frameworks currently
-not considered for inclusion as MLflow built-in flavors. Just like built-in flavors, you can use
-this package to save your model as an MLflow artifact, load your model from MLflow for batch
-inference, and deploy your model to a serving endpoint using MLflow deployment tools.
+The `MLflavors <https://github.com/ml-toolkits/mlflavors>`_ package adds MLflow support for some
+popular machine learning frameworks currently not considered for inclusion as MLflow built-in flavors.
+Similar to the built-in flavors, you can use this package to save your model as an MLflow artifact,
+load your model from MLflow for batch inference, and deploy your model to a serving endpoint using MLflow
+deployment tools.
 
 The following open-source libraries are currently supported:
 
@@ -30,7 +31,7 @@ The following open-source libraries are currently supported:
         - `MLflow-SDV <https://mlflavors.readthedocs.io/en/latest/examples.html#sdv>`_
         - Synthetic Data Generation
 
-The MLflow interface for the supported frameworks closely follows the design of built-in flavors.
+The interface design for the supported frameworks is similar to many of the existing built-in flavors.
 Particularly, the interface for utilizing the custom model loaded as a ``pyfunc`` flavor
 for generating predictions uses a single-row Pandas DataFrame configuration argument to expose the
 parameters of the flavor's inference API.
@@ -54,6 +55,7 @@ parameters of the flavor's inference API.
 .. |license| image:: https://img.shields.io/badge/License-BSD--3--Clause-blue?style=for-the-badge
     :target: https://opensource.org/license/bsd-3-clause/
     :alt: BSD-3-Clause License
+
 
 .. toctree::
    :maxdepth: 2
