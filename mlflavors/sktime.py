@@ -74,7 +74,6 @@ Index  predict_method    coverage     fh
 """  # noqa: E501
 import logging
 import os
-import pickle
 
 import mlflow
 import numpy as np
@@ -109,6 +108,7 @@ from mlflow.utils.model_utils import (
     _validate_and_prepare_target_save_path,
 )
 from mlflow.utils.requirements_utils import _get_pinned_requirement
+from sktime.base._serialize import load
 from sktime.utils.multiindex import flatten_multiindex
 
 import mlflavors
@@ -419,23 +419,11 @@ def load_model(model_uri, dst_path=None):
 
 
 def _save_model(model, path, serialization_format):
-    with open(path, "wb") as out:
-        if serialization_format == SERIALIZATION_FORMAT_PICKLE:
-            pickle.dump(model, out)
-        else:
-            import cloudpickle
-
-            cloudpickle.dump(model, out)
+    model.save(path=path, serialization_format=serialization_format)
 
 
 def _load_model(path, serialization_format):
-    with open(path, "rb") as pickled_model:
-        if serialization_format == SERIALIZATION_FORMAT_PICKLE:
-            return pickle.load(pickled_model)
-        elif serialization_format == SERIALIZATION_FORMAT_CLOUDPICKLE:
-            import cloudpickle
-
-            return cloudpickle.load(pickled_model)
+    return load(path)
 
 
 def _load_pyfunc(path):

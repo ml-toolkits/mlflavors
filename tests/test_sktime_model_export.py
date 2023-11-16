@@ -14,11 +14,12 @@ from mlflow.models.utils import _read_example
 from mlflow.tracking._model_registry import DEFAULT_AWAIT_MAX_SLEEP_SECONDS
 from mlflow.tracking.artifact_utils import _download_artifact_from_uri
 from mlflow.utils.environment import _mlflow_conda_env
-from sktime.datasets import load_airline, load_longley
+from sktime.datasets import load_airline, load_arrow_head, load_longley
 from sktime.datatypes import convert
 from sktime.forecasting.arima import AutoARIMA
 from sktime.forecasting.model_selection import temporal_train_test_split
 from sktime.forecasting.naive import NaiveForecaster
+from sktime.utils.validation._dependencies import _check_soft_dependencies
 
 import mlflavors.sktime
 
@@ -57,6 +58,14 @@ def data_longley():
 
 
 @pytest.fixture(scope="module")
+def test_data_arrow_head():
+    """Create sample data for univariate classification."""
+    X_train, y_train = load_arrow_head(split="TRAIN")
+    X_test, y_test = load_arrow_head(split="TEST")
+    return y_train.astype(int), y_test.astype(int), X_train, X_test
+
+
+@pytest.fixture(scope="module")
 def auto_arima_model(data_airline):
     """Create instance of fitted auto arima model."""
     return AutoARIMA(sp=12, d=0, max_p=2, max_q=2, suppress_warnings=True).fit(
@@ -70,6 +79,22 @@ def naive_forecaster_model_with_regressor(data_longley):
     y_train, _, X_train, _ = data_longley
     model = NaiveForecaster()
     return model.fit(y_train, X_train)
+
+
+@pytest.mark.skipif(
+    not _check_soft_dependencies("tensorflow", severity="none"),
+    reaons="skip test if required soft dependency is not available.",
+)
+@pytest.fixture(scope="module")
+def cnn_model(test_data_arrow_head):
+    """Create an instance of fitted ResNet Classifier model."""
+    from sktime.classification.deep_learning.cnn import CNNClassifier
+
+    y_train, _, X_train, _ = test_data_arrow_head
+
+    return CNNClassifier(n_epochs=1, n_conv_layers=1, kernel_size=3).fit(
+        X_train, y_train
+    )
 
 
 @pytest.mark.parametrize("serialization_format", ["pickle", "cloudpickle"])
@@ -88,6 +113,26 @@ def test_auto_arima_model_save_and_load(
 
     np.testing.assert_array_equal(
         auto_arima_model.predict(fh=FH), loaded_model.predict(fh=FH)
+    )
+
+
+@pytest.mark.parametrize("serialization_format", ["pickle", "cloudpickle"])
+def test_cnn_model_save_and_load(
+    cnn_model, test_data_arrow_head, model_path, serialization_format
+):
+    """Test saving and loading of DL sktime estimator."""
+
+    mlflavors.sktime.save_model(
+        sktime_model=cnn_model,
+        path=model_path,
+        serialization_format=serialization_format,
+    )
+    loaded_model = mlflavors.sktime.load_model(model_uri=model_path)
+
+    _, _, _, X_test = test_data_arrow_head
+
+    np.testing.assert_array_almost_equal(
+        cnn_model.predict(X_test), loaded_model.predict(X_test)
     )
 
 
