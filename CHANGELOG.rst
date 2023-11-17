@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.2.0
+---------------------
+Added:
+
+* MLflavors can now save and load Sktime deep learning estimators (#28, @oorjaa-sagar)
+
 0.1.0
 ---------------------
 mlflavors 0.1.0 is the initial release.
